@@ -45,6 +45,8 @@ export class CollaborationDetailPage implements OnInit {
     addIcons({ chevronBackOutline, shareOutline, locationOutline });
   }
 
+  goBack(): void { window.history.back(); }
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.collabService.getCollaborationById(id).subscribe((c) => {

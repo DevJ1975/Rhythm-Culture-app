@@ -61,6 +61,8 @@ export class EditProfilePage implements OnInit {
     addIcons({ chevronBackOutline, cameraOutline, checkmarkOutline });
   }
 
+  goBack(): void { window.history.back(); }
+
   async ngOnInit(): Promise<void> {
     const uid = this.authService.currentUser?.uid;
     if (!uid) return;

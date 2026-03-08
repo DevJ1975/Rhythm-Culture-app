@@ -39,6 +39,8 @@ export class ConversationPage implements OnInit {
     addIcons({ chevronBackOutline, sendOutline, imageOutline, micOutline });
   }
 
+  goBack(): void { window.history.back(); }
+
   ngOnInit(): void {
     this.conversationId = this.route.snapshot.paramMap.get('conversationId')!;
     const uid = this.authService.currentUser?.uid;

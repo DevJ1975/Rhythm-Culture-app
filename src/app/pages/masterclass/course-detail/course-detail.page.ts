@@ -39,6 +39,8 @@ export class CourseDetailPage implements OnInit {
     addIcons({ chevronBackOutline, playCircle, lockClosed, checkmarkCircle, starOutline });
   }
 
+  goBack(): void { window.history.back(); }
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.courseService.getCourseById(id).subscribe((course) => {

@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
 import {
   IonHeader, IonToolbar, IonContent, IonButton, IonIcon,
@@ -25,7 +26,7 @@ import { SpecialtyBadgeComponent } from '../../shared/components/specialty-badge
   styleUrls: ['./profile.page.scss'],
   standalone: true,
   imports: [
-    CommonModule, RouterModule,
+    CommonModule, RouterModule, FormsModule,
     IonHeader, IonToolbar, IonContent, IonButton, IonIcon,
     IonButtons, IonRefresher, IonRefresherContent, IonSkeletonText,
     IonGrid, IonRow, IonCol, IonSegment, IonSegmentButton, IonLabel,
@@ -52,6 +53,8 @@ export class ProfilePage implements OnInit {
       personAddOutline, checkmarkOutline, ellipsisVertical, chevronBackOutline,
     });
   }
+
+  goBack(): void { window.history.back(); }
 
   ngOnInit(): void {
     const uidParam = this.route.snapshot.paramMap.get('uid');

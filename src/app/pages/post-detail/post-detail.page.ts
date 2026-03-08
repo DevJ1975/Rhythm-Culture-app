@@ -38,6 +38,8 @@ export class PostDetailPage implements OnInit {
     addIcons({ chevronBackOutline, sendOutline });
   }
 
+  goBack(): void { window.history.back(); }
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
     this.postService.getPostById(id).subscribe((p) => {

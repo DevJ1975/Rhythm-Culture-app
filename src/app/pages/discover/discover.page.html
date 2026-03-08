@@ -59,7 +59,7 @@
         </ion-avatar>
         <ion-label>
           <h2 class="text-white font-semibold">{{ artist.artistName || artist.displayName }}</h2>
-          <p class="text-gray-500 text-sm">{{ artist.specialties?.slice(0,3).join(' · ') }}</p>
+          <p class="text-gray-500 text-sm">{{ (artist.specialties || []).slice(0,3).join(' · ') }}</p>
           <p class="text-gray-600 text-xs">{{ artist.location }}</p>
         </ion-label>
         <div slot="end" class="text-right">
