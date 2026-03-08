@@ -107,5 +107,47 @@ service cloud.firestore {
       allow create: if isAuthenticated() && request.resource.data.followerId == request.auth.uid;
       allow delete: if isAuthenticated() && resource.data.followerId == request.auth.uid;
     }
+
+    // Collaboration applications
+    match /collaboration_applications/{applicationId} {
+      allow read: if isAuthenticated() && (
+        resource.data.applicantId == request.auth.uid ||
+        // Collaboration creator can also read applications
+        get(/databases/$(database)/documents/collaborations/$(resource.data.collaborationId)).data.creatorId == request.auth.uid
+      );
+      allow create: if isAuthenticated() && request.resource.data.applicantId == request.auth.uid;
+      // Only the collab creator can update (accept/reject)
+      allow update: if isAuthenticated() &&
+        get(/databases/$(database)/documents/collaborations/$(resource.data.collaborationId)).data.creatorId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // Event registrations
+    match /event_registrations/{registrationId} {
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        get(/databases/$(database)/documents/events/$(resource.data.eventId)).data.organizerId == request.auth.uid
+      );
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // Course enrollments
+    match /course_enrollments/{enrollmentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        get(/databases/$(database)/documents/courses/$(resource.data.courseId)).data.instructorId == request.auth.uid
+      );
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // Meta / system documents (trending, etc.) — written only by Cloud Functions
+    match /meta/{document} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Cloud Functions use Admin SDK (bypasses rules)
+    }
   }
 }

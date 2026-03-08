@@ -1,6 +1,8 @@
 {
   "hosting": {
     "public": "www",
+    "cleanUrls": true,
+    "trailingSlash": false,
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -19,6 +21,30 @@
           {
             "key": "Cache-Control",
             "value": "no-cache"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "DENY"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "X-XSS-Protection",
+            "value": "1; mode=block"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "camera=(self), microphone=(self), geolocation=(self)"
+          },
+          {
+            "key": "Strict-Transport-Security",
+            "value": "max-age=31536000; includeSubDomains"
           }
         ]
       },
@@ -27,7 +53,7 @@
         "headers": [
           {
             "key": "Cache-Control",
-            "value": "public, max-age=604800"
+            "value": "public, max-age=604800, immutable"
           }
         ]
       }
