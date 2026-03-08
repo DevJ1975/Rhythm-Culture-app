@@ -1,0 +1,15 @@
+.post-card {
+  margin: 0 0 1px 0;
+  border-radius: 0;
+  background: var(--ion-card-background);
+  border-bottom: 1px solid #1A1A1A;
+}
+
+.media-container {
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:active {
+    opacity: 0.85;
+  }
+}

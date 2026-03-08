@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Messages</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon name="create-outline" class="text-primary-400"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <div class="px-4 py-3">
+    <ion-searchbar
+      placeholder="Search conversations..."
+      style="--background: #1A1A1A; --color: white; --placeholder-color: #6B7280; --border-radius: 14px;"
+    ></ion-searchbar>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!isLoading && conversations.length === 0" class="flex flex-col items-center py-16">
+    <div class="w-16 h-16 rounded-full bg-dark-200 flex items-center justify-center mb-4">
+      <ion-icon name="create-outline" class="text-gray-600 text-3xl"></ion-icon>
+    </div>
+    <h3 class="text-white font-bold mb-2">No messages yet</h3>
+    <p class="text-gray-500 text-sm text-center max-w-xs">Connect with other artists by visiting their profile and sending a message.</p>
+  </div>
+
+  <!-- Conversations list -->
+  <ion-list lines="none" *ngIf="conversations.length > 0">
+    <ion-item
+      *ngFor="let conv of conversations"
+      [routerLink]="['/messages', conv.id]"
+      detail="false"
+      class="cursor-pointer transition-colors hover:bg-dark-200 rounded-xl mx-2 my-0.5"
+    >
+      <ion-avatar slot="start" class="w-14 h-14 rounded-full">
+        <img
+          [src]="getOtherParticipant(conv)?.photoURL || 'assets/images/default-avatar.png'"
+          class="w-full h-full object-cover"
+        />
+      </ion-avatar>
+      <ion-label>
+        <h2 class="text-white font-semibold">{{ getOtherParticipant(conv)?.displayName || 'Artist' }}</h2>
+        <p class="text-gray-500 text-sm truncate">{{ conv.lastMessage || 'No messages yet' }}</p>
+      </ion-label>
+      <div slot="end" class="flex flex-col items-end gap-1">
+        <span class="text-gray-500 text-xs">{{ formatTime(conv.lastMessageAt) }}</span>
+        <ion-badge *ngIf="getUnreadCount(conv) > 0" color="primary">
+          {{ getUnreadCount(conv) }}
+        </ion-badge>
+      </div>
+    </ion-item>
+  </ion-list>
+</ion-content>

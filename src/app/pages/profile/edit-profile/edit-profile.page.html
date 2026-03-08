@@ -1,0 +1,97 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="history.back()">
+        <ion-icon name="chevron-back-outline" slot="icon-only" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Edit Profile</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="onSave()" [disabled]="isSaving">
+        <ion-spinner *ngIf="isSaving" name="crescent" class="w-5 h-5"></ion-spinner>
+        <ion-icon *ngIf="!isSaving" name="checkmark-outline" class="text-primary-400 text-xl"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="form" (ngSubmit)="onSave()">
+
+    <!-- Avatar -->
+    <div class="flex flex-col items-center py-6">
+      <div class="relative mb-3">
+        <img
+          [src]="profile?.photoURL || 'assets/images/default-avatar.png'"
+          class="w-24 h-24 rounded-2xl object-cover"
+          alt="Profile photo"
+        />
+        <button
+          type="button"
+          (click)="changePhoto()"
+          class="absolute -bottom-2 -right-2 w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center"
+        >
+          <ion-icon name="camera-outline" class="text-white text-sm"></ion-icon>
+        </button>
+      </div>
+      <p *ngIf="uploadProgress > 0 && uploadProgress < 100" class="text-primary-400 text-xs">
+        Uploading {{ uploadProgress | number:'1.0-0' }}%...
+      </p>
+    </div>
+
+    <!-- Fields -->
+    <div class="space-y-4">
+      <div>
+        <label class="text-gray-400 text-xs mb-1 block">Artist Name</label>
+        <ion-input formControlName="artistName" placeholder="Your stage name" class="input-field"></ion-input>
+      </div>
+      <div>
+        <label class="text-gray-400 text-xs mb-1 block">Display Name</label>
+        <ion-input formControlName="displayName" placeholder="Your full name" class="input-field"></ion-input>
+      </div>
+      <div>
+        <label class="text-gray-400 text-xs mb-1 block">Bio</label>
+        <ion-textarea
+          formControlName="bio"
+          placeholder="Tell your story..."
+          rows="4"
+          class="input-field"
+        ></ion-textarea>
+      </div>
+      <div>
+        <label class="text-gray-400 text-xs mb-1 block">Location</label>
+        <ion-input formControlName="location" placeholder="City, Country" class="input-field"></ion-input>
+      </div>
+    </div>
+
+    <!-- Specialties -->
+    <div class="mt-6">
+      <h3 class="text-white font-semibold mb-3">Specialties</h3>
+      <div class="flex flex-wrap gap-2">
+        <button
+          *ngFor="let s of specialties"
+          type="button"
+          (click)="toggleSpecialty(s)"
+          class="px-3 py-1.5 rounded-full text-xs font-medium border transition-all"
+          [class]="isSelected(s) ? 'bg-primary-500 border-primary-500 text-white' : 'bg-dark-200 border-dark-300 text-gray-400'"
+        >{{ s }}</button>
+      </div>
+    </div>
+
+    <!-- Social Links -->
+    <div class="mt-6 space-y-3">
+      <h3 class="text-white font-semibold mb-3">Social Links</h3>
+      <ion-input formControlName="instagramUrl" placeholder="Instagram username" class="input-field"></ion-input>
+      <ion-input formControlName="tiktokUrl" placeholder="TikTok username" class="input-field"></ion-input>
+      <ion-input formControlName="youtubeUrl" placeholder="YouTube channel" class="input-field"></ion-input>
+      <ion-input formControlName="websiteUrl" placeholder="Website URL" class="input-field"></ion-input>
+    </div>
+
+    <div class="pb-8 mt-6">
+      <ion-button expand="block" type="submit" [disabled]="isSaving" style="--background: #0066FF; --border-radius: 14px;" class="h-14 font-bold">
+        Save Changes
+      </ion-button>
+    </div>
+
+  </form>
+</ion-content>

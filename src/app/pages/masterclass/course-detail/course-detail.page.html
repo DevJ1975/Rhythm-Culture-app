@@ -1,0 +1,87 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="history.back()">
+        <ion-icon name="chevron-back-outline" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <div *ngIf="isLoading" class="flex items-center justify-center h-full">
+    <ion-spinner color="primary"></ion-spinner>
+  </div>
+
+  <ng-container *ngIf="!isLoading && course">
+    <!-- Cover -->
+    <div class="relative aspect-video bg-dark-300">
+      <img *ngIf="course.coverImageUrl" [src]="course.coverImageUrl" class="w-full h-full object-cover" />
+      <div class="absolute inset-0 bg-gradient-to-t from-dark-DEFAULT to-transparent"></div>
+    </div>
+
+    <div class="px-4 py-4">
+      <h1 class="text-white font-bold text-xl mb-1">{{ course.title }}</h1>
+      <p class="text-gray-400 text-sm mb-2">{{ course.subtitle }}</p>
+      <p class="text-gray-500 text-xs mb-4">by {{ course.instructor?.displayName }}</p>
+
+      <!-- Stats row -->
+      <div class="flex items-center gap-4 mb-4">
+        <div class="flex items-center gap-1">
+          <ion-icon name="star-outline" class="text-yellow-400 text-sm"></ion-icon>
+          <span class="text-white text-sm font-bold">{{ course.rating.toFixed(1) }}</span>
+        </div>
+        <span class="text-gray-500 text-sm">{{ course.lessonsCount }} lessons</span>
+        <span class="text-gray-500 text-sm capitalize">{{ course.level }}</span>
+      </div>
+
+      <!-- Description -->
+      <p class="text-gray-400 text-sm leading-relaxed mb-6">{{ course.description }}</p>
+
+      <!-- Progress (if enrolled) -->
+      <div *ngIf="isEnrolled && enrollment" class="mb-6">
+        <div class="flex justify-between mb-2">
+          <span class="text-gray-400 text-sm">Your progress</span>
+          <span class="text-primary-400 text-sm font-semibold">{{ enrollment.progressPercentage }}%</span>
+        </div>
+        <ion-progress-bar [value]="enrollment.progressPercentage / 100" color="primary"></ion-progress-bar>
+      </div>
+
+      <!-- Enroll / Continue CTA -->
+      <ion-button
+        expand="block"
+        (click)="enroll()"
+        [disabled]="isEnrolled || isEnrolling"
+        style="--background: #0066FF; --border-radius: 14px;"
+        class="h-14 font-bold mb-6"
+      >
+        <ion-spinner *ngIf="isEnrolling" name="crescent" class="mr-2"></ion-spinner>
+        {{ isEnrolled ? '▶ Continue Learning' : (course.isFree ? 'Enroll Free' : 'Enroll for $' + course.price) }}
+      </ion-button>
+
+      <!-- Lessons list -->
+      <h2 class="text-white font-bold text-lg mb-3">Course Content</h2>
+      <ion-list lines="none">
+        <ion-item
+          *ngFor="let lesson of lessons; let i = index"
+          class="rounded-xl mb-2 bg-dark-200"
+          [class.opacity-60]="!isEnrolled && !lesson.isFree && i > 0"
+        >
+          <div slot="start" class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+               [class]="isLessonCompleted(lesson.id) ? 'bg-green-500 bg-opacity-20' : 'bg-dark-300'">
+            <ion-icon
+              [name]="isLessonCompleted(lesson.id) ? 'checkmark-circle' : (isEnrolled || lesson.isFree ? 'play-circle' : 'lock-closed')"
+              [class]="isLessonCompleted(lesson.id) ? 'text-green-400' : 'text-gray-500'"
+              class="text-lg"
+            ></ion-icon>
+          </div>
+          <ion-label>
+            <h3 class="text-white text-sm font-medium">{{ lesson.title }}</h3>
+            <p class="text-gray-500 text-xs">{{ lesson.duration ? formatDuration(lesson.duration) : '' }}</p>
+          </ion-label>
+          <span *ngIf="lesson.isFree" slot="end" class="text-xs text-green-400 bg-green-500 bg-opacity-10 px-2 py-0.5 rounded-full">FREE</span>
+        </ion-item>
+      </ion-list>
+    </div>
+  </ng-container>
+</ion-content>

@@ -1,0 +1,32 @@
+<div class="user-avatar-wrapper inline-flex items-center gap-2">
+  <div class="relative inline-block">
+    <a [routerLink]="navigable ? ['/profile', user.uid] : null" [class.pointer-events-none]="!navigable">
+      <ion-avatar [class]="sizeClasses + ' ring-2 ring-dark-300'">
+        <img
+          [src]="user.photoURL || 'assets/images/default-avatar.png'"
+          [alt]="user.displayName"
+          class="w-full h-full object-cover"
+          loading="lazy"
+        />
+      </ion-avatar>
+    </a>
+
+    <!-- Verified badge -->
+    <ion-icon
+      *ngIf="showVerified && user.isVerified"
+      name="checkmark-circle"
+      class="absolute -bottom-0.5 -right-0.5 text-primary-500 bg-dark-DEFAULT rounded-full"
+      [style.font-size]="verifiedIconSize"
+    ></ion-icon>
+  </div>
+
+  <!-- Name / Specialty -->
+  <div *ngIf="showName" class="flex flex-col min-w-0">
+    <span class="text-white font-semibold text-sm truncate leading-tight">
+      {{ user.displayName }}
+    </span>
+    <span *ngIf="showSpecialty && (user as any).specialties?.length" class="text-gray-500 text-xs truncate">
+      {{ (user as any).specialties[0] }}
+    </span>
+  </div>
+</div>

@@ -1,0 +1,117 @@
+<ion-card class="post-card">
+  <!-- Author Header -->
+  <div class="flex items-center justify-between px-4 pt-4 pb-2">
+    <a [routerLink]="['/profile', post.authorId]" class="flex items-center gap-3 no-underline">
+      <ion-avatar class="w-10 h-10">
+        <img
+          [src]="post.author?.photoURL || 'assets/images/default-avatar.png'"
+          [alt]="post.author?.displayName"
+          class="w-full h-full object-cover"
+        />
+      </ion-avatar>
+      <div>
+        <p class="text-white font-semibold text-sm m-0 leading-tight">
+          {{ post.author?.artistName || post.author?.displayName }}
+        </p>
+        <p class="text-gray-500 text-xs m-0">
+          {{ getTimeSince(post.createdAt) }}
+        </p>
+      </div>
+    </a>
+
+    <ion-button fill="clear" size="small" color="medium">
+      <ion-icon slot="icon-only" name="ellipsis-horizontal"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Caption -->
+  <div *ngIf="post.caption" class="px-4 pb-3">
+    <p class="text-white text-sm m-0 leading-relaxed">{{ post.caption }}</p>
+  </div>
+
+  <!-- Specialty tags -->
+  <div *ngIf="post.tags?.length" class="px-4 pb-3 flex flex-wrap gap-2">
+    <span
+      *ngFor="let tag of post.tags.slice(0, 4)"
+      class="specialty-badge text-xs"
+    >#{{ tag }}</span>
+  </div>
+
+  <!-- Media -->
+  <div class="media-container relative bg-dark-200" *ngIf="post.media?.length">
+    <!-- Video Post -->
+    <ng-container *ngIf="post.type === 'video'">
+      <div class="relative aspect-[9/16] max-h-[500px] overflow-hidden">
+        <img
+          [src]="post.media[0].thumbnailUrl || 'assets/images/video-placeholder.png'"
+          class="w-full h-full object-cover"
+          [alt]="post.caption"
+        />
+        <div class="absolute inset-0 flex items-center justify-center">
+          <ion-icon
+            name="play-circle"
+            class="text-white opacity-90"
+            style="font-size: 64px;"
+          ></ion-icon>
+        </div>
+        <div class="absolute bottom-2 right-2 bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded-md">
+          {{ post.media[0].duration ? (post.media[0].duration | number:'1.0-0') + 's' : '' }}
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Image Post -->
+    <ng-container *ngIf="post.type === 'image'">
+      <div class="aspect-square overflow-hidden">
+        <img
+          [src]="post.media[0].url"
+          class="w-full h-full object-cover"
+          [alt]="post.caption"
+          loading="lazy"
+        />
+      </div>
+    </ng-container>
+
+    <!-- Audio Post -->
+    <ng-container *ngIf="post.type === 'audio'">
+      <div class="flex items-center gap-4 px-4 py-6 bg-dark-200">
+        <div class="w-16 h-16 rounded-2xl bg-primary-500 bg-opacity-20 flex items-center justify-center flex-shrink-0">
+          <ion-icon name="musical-note-outline" class="text-primary-400 text-3xl"></ion-icon>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="h-2 bg-dark-300 rounded-full overflow-hidden">
+            <div class="h-full bg-primary-500 rounded-full w-0"></div>
+          </div>
+          <p class="text-gray-500 text-xs mt-1">Audio track</p>
+        </div>
+        <ion-button fill="clear" color="primary" size="small">
+          <ion-icon slot="icon-only" name="play-circle"></ion-icon>
+        </ion-button>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Actions -->
+  <div *ngIf="showActions" class="flex items-center px-2 py-2 border-t border-dark-300">
+    <!-- Like -->
+    <ion-button fill="clear" (click)="toggleLike()" [disabled]="isLoading">
+      <ion-icon
+        slot="start"
+        [name]="isLiked ? 'heart' : 'heart-outline'"
+        [class]="isLiked ? 'text-red-500' : 'text-gray-400'"
+      ></ion-icon>
+      <span class="text-gray-400 text-sm">{{ formatCount(post.likesCount) }}</span>
+    </ion-button>
+
+    <!-- Comment -->
+    <ion-button fill="clear" color="medium" (click)="onComment()">
+      <ion-icon slot="start" name="chatbubble-outline"></ion-icon>
+      <span class="text-sm">{{ formatCount(post.commentsCount) }}</span>
+    </ion-button>
+
+    <!-- Share -->
+    <ion-button fill="clear" color="medium" (click)="onShare()" class="ml-auto">
+      <ion-icon slot="icon-only" name="share-social-outline"></ion-icon>
+    </ion-button>
+  </div>
+</ion-card>

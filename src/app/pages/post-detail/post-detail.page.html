@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="history.back()">
+        <ion-icon name="chevron-back-outline" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <span class="text-white font-bold">Post</span>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <app-post-card *ngIf="post" [post]="post" [showActions]="true"></app-post-card>
+
+  <div class="px-4 py-3 border-b border-dark-300">
+    <h3 class="text-white font-bold text-sm">Comments ({{ post?.commentsCount || 0 }})</h3>
+  </div>
+
+  <ion-list lines="none">
+    <ion-item *ngFor="let comment of comments" class="bg-transparent mb-2">
+      <ion-avatar slot="start" class="w-9 h-9">
+        <img [src]="comment.author?.photoURL || 'assets/images/default-avatar.png'" class="w-full h-full object-cover" />
+      </ion-avatar>
+      <ion-label>
+        <div class="flex items-baseline gap-2">
+          <span class="text-white font-semibold text-sm">{{ comment.author?.displayName }}</span>
+          <span class="text-gray-600 text-xs">{{ formatTime(comment.createdAt) }}</span>
+        </div>
+        <p class="text-gray-300 text-sm mt-0.5">{{ comment.text }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
+
+<ion-footer>
+  <div class="flex items-center gap-2 px-4 py-3 bg-dark-100 border-t border-dark-300">
+    <ion-input
+      [(ngModel)]="commentText"
+      placeholder="Add a comment..."
+      class="flex-1 bg-dark-200 rounded-xl px-4 py-2 text-white text-sm"
+      style="--color: white; --placeholder-color: #6B7280;"
+    ></ion-input>
+    <ion-button fill="clear" color="primary" (click)="sendComment()" [disabled]="!commentText.trim() || isSending">
+      <ion-icon slot="icon-only" name="send-outline"></ion-icon>
+    </ion-button>
+  </div>
+</ion-footer>

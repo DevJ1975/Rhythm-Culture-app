@@ -1,0 +1,95 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Events</ion-title>
+    <ion-button slot="end" fill="clear" routerLink="/events/create">
+      <ion-icon name="add-outline" class="text-primary-400"></ion-icon>
+    </ion-button>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+
+  <!-- Category filter -->
+  <div class="flex gap-2 px-4 py-4 overflow-x-auto hide-scrollbar">
+    <button
+      *ngFor="let cat of categories"
+      (click)="filterByCategory(cat)"
+      class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-all"
+      [class]="selectedCategory === cat ? 'bg-primary-500 border-primary-500 text-white' : 'bg-dark-200 border-dark-300 text-gray-400'"
+    >{{ cat }}</button>
+  </div>
+
+  <!-- Skeleton loading -->
+  <div *ngIf="isLoading" class="px-4 space-y-4">
+    <div *ngFor="let i of [1,2,3]" class="card-bordered">
+      <ion-skeleton-text animated style="width: 100%; height: 160px;"></ion-skeleton-text>
+      <div class="p-4">
+        <ion-skeleton-text animated style="width: 60%; height: 16px;" class="rounded mb-2"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 40%; height: 12px;" class="rounded"></ion-skeleton-text>
+      </div>
+    </div>
+  </div>
+
+  <!-- Events list -->
+  <div *ngIf="!isLoading" class="px-4 space-y-4 pb-8">
+    <div
+      *ngFor="let event of events"
+      [routerLink]="['/events', event.id]"
+      class="card-bordered overflow-hidden cursor-pointer"
+    >
+      <!-- Event Image -->
+      <div class="relative h-40 bg-gradient-to-br from-primary-900 to-purple-900">
+        <img
+          *ngIf="event.coverImageUrl"
+          [src]="event.coverImageUrl"
+          class="w-full h-full object-cover"
+          loading="lazy"
+        />
+        <div class="absolute top-3 left-3">
+          <span class="bg-dark-DEFAULT bg-opacity-70 text-white text-xs px-2 py-1 rounded-lg backdrop-blur-sm">
+            {{ event.category }}
+          </span>
+        </div>
+        <div *ngIf="event.isFree" class="absolute top-3 right-3">
+          <span class="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-lg">FREE</span>
+        </div>
+        <div *ngIf="event.format === 'virtual'" class="absolute bottom-3 right-3">
+          <span class="bg-primary-500 bg-opacity-80 text-white text-xs px-2 py-1 rounded-lg">
+            <ion-icon name="globe-outline" class="inline text-xs mr-0.5"></ion-icon>
+            Virtual
+          </span>
+        </div>
+      </div>
+
+      <!-- Event Info -->
+      <div class="p-4">
+        <h3 class="text-white font-bold text-base mb-2 leading-tight">{{ event.title }}</h3>
+
+        <div class="space-y-1.5">
+          <div class="flex items-center gap-2">
+            <ion-icon name="calendar-outline" class="text-primary-400 text-sm flex-shrink-0"></ion-icon>
+            <span class="text-gray-400 text-sm">{{ formatDate(event.eventDate) }} · {{ formatTime(event.eventDate) }}</span>
+          </div>
+          <div class="flex items-center gap-2" *ngIf="event.format !== 'virtual' && event.location?.city">
+            <ion-icon name="location-outline" class="text-primary-400 text-sm flex-shrink-0"></ion-icon>
+            <span class="text-gray-400 text-sm">{{ event.location.venue ? event.location.venue + ', ' : '' }}{{ event.location.city }}</span>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex items-center justify-between mt-3 pt-3 border-t border-dark-300">
+          <span class="text-gray-500 text-sm">{{ event.currentAttendees }}{{ event.maxAttendees ? '/' + event.maxAttendees : '' }} attending</span>
+          <span class="text-white font-bold">{{ event.isFree ? 'Free' : '$' + event.price }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="events.length === 0" class="flex flex-col items-center py-16">
+      <ion-icon name="calendar-outline" class="text-gray-700 text-5xl mb-4"></ion-icon>
+      <p class="text-white font-semibold mb-2">No upcoming events</p>
+      <p class="text-gray-500 text-sm text-center">Check back soon for workshops, battles, and more.</p>
+    </div>
+  </div>
+
+</ion-content>

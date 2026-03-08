@@ -1,0 +1,125 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="history.back()">
+        <ion-icon name="chevron-back-outline" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button fill="clear">
+        <ion-icon name="share-outline" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <div *ngIf="isLoading" class="flex justify-center py-16"><ion-spinner color="primary"></ion-spinner></div>
+
+  <ng-container *ngIf="!isLoading && collab">
+    <div class="px-4 py-5 pb-32">
+      <!-- Header -->
+      <div class="flex items-start gap-2 mb-4">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class="text-xs bg-primary-500 bg-opacity-20 text-primary-300 border border-primary-500 border-opacity-30 px-2 py-0.5 rounded-full">{{ collab.type }}</span>
+            <span *ngIf="collab.isPaid" class="text-xs text-green-400 bg-green-500 bg-opacity-10 px-2 py-0.5 rounded-full">💰 Paid</span>
+            <span *ngIf="collab.isRemote" class="text-xs text-blue-400">🌐 Remote</span>
+          </div>
+          <h1 class="text-white font-black text-xl leading-tight">{{ collab.title }}</h1>
+        </div>
+      </div>
+
+      <!-- Location -->
+      <div class="flex items-center gap-2 mb-4" *ngIf="!collab.isRemote && collab.city">
+        <ion-icon name="location-outline" class="text-primary-400"></ion-icon>
+        <span class="text-gray-400 text-sm">{{ collab.city }}{{ collab.country ? ', ' + collab.country : '' }}</span>
+      </div>
+
+      <!-- Description -->
+      <p class="text-gray-400 text-sm leading-relaxed mb-6">{{ collab.description }}</p>
+
+      <!-- Skills required -->
+      <div class="mb-6">
+        <h3 class="text-white font-bold mb-3">Looking for</h3>
+        <div class="flex flex-wrap gap-2">
+          <span *ngFor="let skill of collab.skills" class="specialty-badge">{{ skill }}</span>
+        </div>
+      </div>
+
+      <!-- Compensation -->
+      <div *ngIf="collab.compensationDetails" class="card-bordered p-4 mb-6">
+        <h3 class="text-white font-bold text-sm mb-2">Compensation</h3>
+        <p class="text-gray-400 text-sm">{{ collab.compensationDetails }}</p>
+      </div>
+
+      <!-- Stats -->
+      <div class="flex gap-4 py-4 border-t border-dark-300">
+        <div>
+          <p class="text-white font-bold">{{ collab.currentApplicants }}</p>
+          <p class="text-gray-500 text-xs">Applicants</p>
+        </div>
+        <div *ngIf="collab.maxApplicants">
+          <p class="text-white font-bold">{{ collab.maxApplicants }}</p>
+          <p class="text-gray-500 text-xs">Max spots</p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- CTA Footer -->
+  <div *ngIf="collab" class="fixed bottom-0 left-0 right-0 p-4 bg-dark-DEFAULT border-t border-dark-300">
+    <ion-button
+      expand="block"
+      (click)="showApplyModal = true"
+      [disabled]="hasApplied || collab.status !== 'open'"
+      style="--background: #0066FF; --border-radius: 14px;"
+      class="h-14 font-bold"
+    >
+      {{ hasApplied ? '✓ Application Sent' : 'Apply Now' }}
+    </ion-button>
+  </div>
+
+  <!-- Apply Modal -->
+  <ion-modal [isOpen]="showApplyModal" (willDismiss)="showApplyModal = false">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button fill="clear" (click)="showApplyModal = false">Cancel</ion-button>
+          </ion-buttons>
+          <ion-label class="text-white font-bold">Apply</ion-label>
+          <ion-buttons slot="end">
+            <ion-button fill="clear" (click)="apply()" [disabled]="applyForm.invalid || isApplying" color="primary">
+              <ion-spinner *ngIf="isApplying" name="crescent" class="w-4 h-4"></ion-spinner>
+              <span *ngIf="!isApplying">Send</span>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <form [formGroup]="applyForm">
+          <div class="mb-4">
+            <label class="text-gray-400 text-xs mb-2 block">Why are you a great fit? *</label>
+            <ion-textarea
+              formControlName="message"
+              placeholder="Tell them about your experience, skills, and what you bring..."
+              rows="6"
+              class="input-field"
+            ></ion-textarea>
+          </div>
+          <div>
+            <label class="text-gray-400 text-xs mb-2 block">Portfolio / Demo link (optional)</label>
+            <ion-textarea
+              formControlName="portfolioUrl"
+              placeholder="YouTube, SoundCloud, Instagram..."
+              rows="2"
+              class="input-field"
+            ></ion-textarea>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

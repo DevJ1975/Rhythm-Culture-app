@@ -1,0 +1,120 @@
+<ion-content class="ion-padding" fullscreen>
+  <div class="flex flex-col min-h-full justify-between">
+
+    <!-- Logo / Branding -->
+    <div class="flex flex-col items-center pt-16 pb-8">
+      <div class="w-20 h-20 bg-primary-500 rounded-3xl flex items-center justify-center mb-6 shadow-lg"
+           style="box-shadow: 0 0 30px rgba(0,102,255,0.4);">
+        <span class="text-white font-black text-3xl">RC</span>
+      </div>
+      <h1 class="text-white font-black text-4xl tracking-tight m-0">Rhythm</h1>
+      <h1 class="text-primary-400 font-black text-4xl tracking-tight m-0">Culture</h1>
+      <p class="text-gray-500 text-sm mt-2">For the global performing arts community</p>
+    </div>
+
+    <!-- Login Form -->
+    <div class="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full px-4">
+
+      <form [formGroup]="loginForm" (ngSubmit)="onEmailLogin()" class="space-y-4">
+
+        <!-- Email -->
+        <div>
+          <div class="relative">
+            <ion-icon name="mail-outline" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10"></ion-icon>
+            <ion-input
+              formControlName="email"
+              type="email"
+              placeholder="Email address"
+              class="input-field pl-11"
+              autocomplete="email"
+            ></ion-input>
+          </div>
+          <ion-note
+            *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+            color="danger"
+            class="text-xs mt-1 block px-1"
+          >Please enter a valid email.</ion-note>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <div class="relative">
+            <ion-icon name="lock-closed-outline" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10"></ion-icon>
+            <ion-input
+              formControlName="password"
+              [type]="showPassword ? 'text' : 'password'"
+              placeholder="Password"
+              class="input-field pl-11 pr-11"
+              autocomplete="current-password"
+            ></ion-input>
+            <button
+              type="button"
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500"
+              (click)="showPassword = !showPassword"
+            >
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Forgot password -->
+        <div class="text-right">
+          <a routerLink="/auth/forgot-password" class="text-primary-400 text-sm">Forgot password?</a>
+        </div>
+
+        <!-- Submit -->
+        <ion-button
+          expand="block"
+          type="submit"
+          [disabled]="loginForm.invalid || isLoading"
+          class="btn-primary h-14 text-base font-bold"
+          style="--border-radius: 14px;"
+        >
+          <ion-spinner *ngIf="isLoading" name="crescent" class="mr-2"></ion-spinner>
+          {{ isLoading ? 'Signing in...' : 'Sign In' }}
+        </ion-button>
+      </form>
+
+      <!-- Divider -->
+      <div class="flex items-center gap-4 my-6">
+        <div class="flex-1 h-px bg-dark-300"></div>
+        <span class="text-gray-600 text-sm">or continue with</span>
+        <div class="flex-1 h-px bg-dark-300"></div>
+      </div>
+
+      <!-- Social Logins -->
+      <div class="space-y-3">
+        <ion-button
+          expand="block"
+          fill="outline"
+          (click)="onGoogleLogin()"
+          [disabled]="isLoading"
+          class="btn-secondary h-14"
+          style="--border-radius: 14px; --border-color: #2A2A2A;"
+        >
+          <ion-icon name="logo-google" slot="start" class="text-white"></ion-icon>
+          Continue with Google
+        </ion-button>
+
+        <ion-button
+          expand="block"
+          fill="outline"
+          (click)="onAppleLogin()"
+          [disabled]="isLoading"
+          class="btn-secondary h-14"
+          style="--border-radius: 14px; --border-color: #2A2A2A;"
+        >
+          <ion-icon name="logo-apple" slot="start" class="text-white"></ion-icon>
+          Continue with Apple
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Register link -->
+    <div class="flex items-center justify-center pb-12 pt-8">
+      <span class="text-gray-500 text-sm">Don't have an account?</span>
+      <a routerLink="/auth/register" class="text-primary-400 font-semibold text-sm ml-2">Join Rhythm Culture</a>
+    </div>
+
+  </div>
+</ion-content>

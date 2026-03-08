@@ -1,0 +1,163 @@
+<ion-content class="ion-padding" fullscreen>
+  <div class="flex flex-col min-h-full">
+
+    <!-- Header -->
+    <div class="flex items-center pt-8 pb-6">
+      <ion-button fill="clear" [routerLink]="step === 1 ? '/auth/login' : null" (click)="step > 1 ? prevStep() : null">
+        <ion-icon name="chevron-back-outline" slot="icon-only" class="text-white"></ion-icon>
+      </ion-button>
+      <div class="flex-1 text-center">
+        <h2 class="text-white font-bold text-xl m-0">Join Rhythm Culture</h2>
+        <p class="text-gray-500 text-sm m-0">Step {{ step }} of 3</p>
+      </div>
+      <div class="w-10"></div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="flex gap-1 px-4 mb-8">
+      <div *ngFor="let s of [1,2,3]"
+           class="h-1 flex-1 rounded-full transition-all duration-300"
+           [class]="s <= step ? 'bg-primary-500' : 'bg-dark-300'">
+      </div>
+    </div>
+
+    <!-- ── Step 1: Basic Info ── -->
+    <ng-container *ngIf="step === 1">
+      <div class="flex-1 px-4">
+        <h3 class="text-white font-bold text-2xl mb-2">Your details</h3>
+        <p class="text-gray-500 mb-8">Create your Rhythm Culture account</p>
+
+        <form [formGroup]="registerForm" class="space-y-4">
+          <!-- Name -->
+          <div class="relative">
+            <ion-icon name="person-outline" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10"></ion-icon>
+            <ion-input
+              formControlName="displayName"
+              type="text"
+              placeholder="Your artist name"
+              class="input-field pl-11"
+            ></ion-input>
+          </div>
+
+          <!-- Email -->
+          <div class="relative">
+            <ion-icon name="mail-outline" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10"></ion-icon>
+            <ion-input
+              formControlName="email"
+              type="email"
+              placeholder="Email address"
+              class="input-field pl-11"
+            ></ion-input>
+          </div>
+
+          <!-- Password -->
+          <div class="relative">
+            <ion-icon name="lock-closed-outline" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 z-10"></ion-icon>
+            <ion-input
+              formControlName="password"
+              [type]="showPassword ? 'text' : 'password'"
+              placeholder="Password (min 8 chars)"
+              class="input-field pl-11 pr-11"
+            ></ion-input>
+            <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500" (click)="showPassword = !showPassword">
+              <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="px-4 pb-8">
+        <ion-button
+          expand="block"
+          (click)="nextStep()"
+          [disabled]="registerForm.get('displayName')?.invalid || registerForm.get('email')?.invalid || registerForm.get('password')?.invalid"
+          class="h-14 font-bold"
+          style="--background: #0066FF; --border-radius: 14px;"
+        >
+          Continue
+        </ion-button>
+      </div>
+    </ng-container>
+
+    <!-- ── Step 2: Specialties ── -->
+    <ng-container *ngIf="step === 2">
+      <div class="flex-1 px-4">
+        <h3 class="text-white font-bold text-2xl mb-2">Your craft</h3>
+        <p class="text-gray-500 mb-8">Select your artistic specialties (choose all that apply)</p>
+
+        <div class="flex flex-wrap gap-3">
+          <button
+            *ngFor="let specialty of specialties"
+            (click)="toggleSpecialty(specialty)"
+            class="px-4 py-2 rounded-full border text-sm font-medium transition-all duration-200"
+            [class]="isSelected(specialty)
+              ? 'bg-primary-500 border-primary-500 text-white'
+              : 'bg-dark-200 border-dark-300 text-gray-400 hover:border-primary-500 hover:text-white'"
+          >
+            {{ specialty }}
+          </button>
+        </div>
+      </div>
+
+      <div class="px-4 pb-8">
+        <ion-button
+          expand="block"
+          (click)="step = 3"
+          class="h-14 font-bold"
+          style="--background: #0066FF; --border-radius: 14px;"
+        >
+          Continue
+        </ion-button>
+        <ion-button fill="clear" expand="block" (click)="step = 3" class="text-gray-500 mt-2">
+          Skip for now
+        </ion-button>
+      </div>
+    </ng-container>
+
+    <!-- ── Step 3: Terms & Submit ── -->
+    <ng-container *ngIf="step === 3">
+      <div class="flex-1 px-4">
+        <h3 class="text-white font-bold text-2xl mb-2">Almost there!</h3>
+        <p class="text-gray-500 mb-8">Review and agree to our terms</p>
+
+        <!-- Selected specialties preview -->
+        <div class="card-bordered p-4 mb-6" *ngIf="selectedSpecialties.length > 0">
+          <p class="text-gray-500 text-sm mb-3">Your specialties:</p>
+          <div class="flex flex-wrap gap-2">
+            <span *ngFor="let s of selectedSpecialties" class="specialty-badge">{{ s }}</span>
+          </div>
+        </div>
+
+        <!-- Terms Agreement -->
+        <div class="flex items-start gap-3 mb-8">
+          <ion-checkbox
+            [formControl]="$any(registerForm.get('agreeTerms'))"
+            color="primary"
+            class="mt-0.5"
+          ></ion-checkbox>
+          <p class="text-gray-400 text-sm leading-relaxed m-0">
+            I agree to the
+            <a href="#" class="text-primary-400">Terms of Service</a>
+            and
+            <a href="#" class="text-primary-400">Privacy Policy</a>.
+            I understand that Rhythm Culture is a community for performing artists.
+          </p>
+        </div>
+      </div>
+
+      <div class="px-4 pb-8">
+        <ion-button
+          expand="block"
+          (click)="onRegister()"
+          [disabled]="registerForm.invalid || isLoading"
+          class="h-14 font-bold"
+          style="--background: #0066FF; --border-radius: 14px;"
+        >
+          <ion-spinner *ngIf="isLoading" name="crescent" class="mr-2"></ion-spinner>
+          {{ isLoading ? 'Creating account...' : 'Create Account' }}
+        </ion-button>
+      </div>
+    </ng-container>
+
+  </div>
+</ion-content>

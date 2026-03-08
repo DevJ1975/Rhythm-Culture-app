@@ -1,0 +1,164 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start" *ngIf="!isOwnProfile">
+      <ion-button fill="clear" (click)="history.back()">
+        <ion-icon name="chevron-back-outline" slot="icon-only" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" *ngIf="isOwnProfile" routerLink="/edit-profile">
+        <ion-icon name="create-outline" slot="icon-only" class="text-white"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" *ngIf="isOwnProfile" routerLink="/tabs/profile">
+        <ion-icon name="settings-outline" slot="icon-only" class="text-white"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear" *ngIf="!isOwnProfile">
+        <ion-icon name="ellipsis-vertical" slot="icon-only" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Skeleton loading -->
+  <ng-container *ngIf="isLoading">
+    <ion-skeleton-text animated style="width: 100%; height: 180px;"></ion-skeleton-text>
+    <div class="px-4 pt-16 pb-4">
+      <ion-skeleton-text animated style="width: 30%; height: 22px;" class="rounded mb-2"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 50%; height: 14px;" class="rounded mb-4"></ion-skeleton-text>
+      <div class="flex gap-4">
+        <ion-skeleton-text *ngFor="let i of [1,2,3,4]" animated style="width: 60px; height: 40px;" class="rounded"></ion-skeleton-text>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Profile content -->
+  <ng-container *ngIf="!isLoading && profile">
+
+    <!-- Cover photo -->
+    <div class="relative">
+      <div
+        class="w-full h-48 bg-gradient-to-br from-primary-900 to-dark-200"
+        [style.background-image]="profile.coverPhotoURL ? 'url(' + profile.coverPhotoURL + ')' : ''"
+        [style.background-size]="'cover'"
+        [style.background-position]="'center'"
+      ></div>
+
+      <!-- Avatar overlapping cover -->
+      <div class="absolute -bottom-14 left-4">
+        <div class="relative">
+          <img
+            [src]="profile.photoURL || 'assets/images/default-avatar.png'"
+            [alt]="profile.displayName"
+            class="w-24 h-24 rounded-2xl object-cover ring-4 ring-dark-DEFAULT"
+          />
+          <div *ngIf="profile.isVerified"
+               class="absolute -bottom-1 -right-1 w-6 h-6 bg-primary-500 rounded-full flex items-center justify-center ring-2 ring-dark-DEFAULT">
+            <ion-icon name="checkmark-outline" class="text-white text-xs"></ion-icon>
+          </div>
+        </div>
+      </div>
+
+      <!-- Follow / Edit button (top right of cover) -->
+      <div class="absolute bottom-3 right-4">
+        <ng-container *ngIf="isOwnProfile">
+          <ion-button size="small" fill="outline" routerLink="/edit-profile"
+                      style="--border-radius: 10px; --border-color: rgba(255,255,255,0.3); --color: white;">
+            Edit Profile
+          </ion-button>
+        </ng-container>
+        <ng-container *ngIf="!isOwnProfile">
+          <ion-button
+            size="small"
+            [fill]="isFollowing ? 'outline' : 'solid'"
+            (click)="toggleFollow()"
+            style="--border-radius: 10px;"
+            [style]="isFollowing ? '--border-color: rgba(255,255,255,0.3); --color: white;' : '--background: #0066FF;'"
+          >
+            <ion-icon [name]="isFollowing ? 'checkmark-outline' : 'person-add-outline'" slot="start"></ion-icon>
+            {{ isFollowing ? 'Following' : 'Follow' }}
+          </ion-button>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Profile info -->
+    <div class="px-4 pt-16 pb-4">
+      <h1 class="text-white font-bold text-xl m-0 leading-tight">{{ profile.artistName || profile.displayName }}</h1>
+      <p *ngIf="profile.artistName && profile.artistName !== profile.displayName" class="text-gray-500 text-sm m-0">{{ profile.displayName }}</p>
+      <p *ngIf="profile.location" class="text-gray-500 text-sm mt-1 m-0">📍 {{ profile.location }}</p>
+
+      <!-- Bio -->
+      <p *ngIf="profile.bio" class="text-gray-300 text-sm mt-3 leading-relaxed m-0">{{ profile.bio }}</p>
+
+      <!-- Specialties -->
+      <div class="flex flex-wrap gap-2 mt-4" *ngIf="profile.specialties?.length">
+        <app-specialty-badge
+          *ngFor="let s of profile.specialties"
+          [specialty]="s"
+        ></app-specialty-badge>
+      </div>
+
+      <!-- Stats -->
+      <div class="flex gap-6 mt-5 pb-4 border-b border-dark-300">
+        <div class="text-center">
+          <p class="text-white font-bold text-lg m-0">{{ formatCount(profile.postsCount) }}</p>
+          <p class="text-gray-500 text-xs m-0">Posts</p>
+        </div>
+        <div class="text-center">
+          <p class="text-white font-bold text-lg m-0">{{ formatCount(profile.followersCount) }}</p>
+          <p class="text-gray-500 text-xs m-0">Followers</p>
+        </div>
+        <div class="text-center">
+          <p class="text-white font-bold text-lg m-0">{{ formatCount(profile.followingCount) }}</p>
+          <p class="text-gray-500 text-xs m-0">Following</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Segment tabs -->
+    <ion-segment [(ngModel)]="activeSegment" class="px-4 mb-4" color="primary">
+      <ion-segment-button value="posts">
+        <ion-icon name="grid-outline"></ion-icon>
+      </ion-segment-button>
+      <ion-segment-button value="videos">
+        <ion-icon name="film-outline"></ion-icon>
+      </ion-segment-button>
+    </ion-segment>
+
+    <!-- Posts grid -->
+    <ion-grid *ngIf="activeSegment === 'posts' || activeSegment === 'videos'" class="p-0">
+      <ion-row>
+        <ion-col
+          *ngFor="let post of posts"
+          size="4"
+          class="p-px"
+        >
+          <div class="relative aspect-square bg-dark-200 overflow-hidden">
+            <img
+              *ngIf="post.media?.length"
+              [src]="post.media[0].thumbnailUrl || post.media[0].url"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+            <div *ngIf="post.type === 'video'" class="absolute top-1 right-1">
+              <ion-icon name="film-outline" class="text-white text-sm drop-shadow"></ion-icon>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Empty posts state -->
+    <div *ngIf="posts.length === 0 && !isLoading" class="flex flex-col items-center py-16">
+      <ion-icon name="grid-outline" class="text-gray-700 text-5xl mb-4"></ion-icon>
+      <p class="text-gray-500">No posts yet</p>
+    </div>
+
+  </ng-container>
+
+</ion-content>

@@ -1,0 +1,112 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Masterclass</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+
+  <!-- Category filter -->
+  <div class="flex gap-2 px-4 py-4 overflow-x-auto hide-scrollbar">
+    <button
+      *ngFor="let cat of categories"
+      (click)="onCategoryChange(cat)"
+      class="flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium border transition-all"
+      [class]="activeCategory === cat ? 'bg-primary-500 border-primary-500 text-white' : 'bg-dark-200 border-dark-300 text-gray-400'"
+    >{{ cat === 'all' ? 'All Courses' : cat }}</button>
+  </div>
+
+  <!-- Featured banner -->
+  <div class="mx-4 mb-6 rounded-2xl overflow-hidden bg-gradient-to-r from-primary-900 to-purple-900 p-6">
+    <p class="text-primary-300 text-xs font-semibold mb-1">FEATURED</p>
+    <h2 class="text-white font-bold text-xl mb-1">Learn from the best</h2>
+    <p class="text-gray-300 text-sm">World-class performers sharing their craft</p>
+  </div>
+
+  <!-- Skeleton loading -->
+  <div *ngIf="isLoading" class="px-4 space-y-4">
+    <div *ngFor="let i of [1,2,3]" class="card-bordered overflow-hidden">
+      <ion-skeleton-text animated style="width: 100%; height: 180px;"></ion-skeleton-text>
+      <div class="p-3">
+        <ion-skeleton-text animated style="width: 60%; height: 16px;" class="rounded mb-2"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 80%; height: 12px;" class="rounded"></ion-skeleton-text>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course cards -->
+  <div *ngIf="!isLoading" class="px-4 space-y-4 pb-8">
+    <div
+      *ngFor="let course of courses"
+      [routerLink]="['/masterclass', course.id]"
+      class="card-bordered overflow-hidden cursor-pointer active:scale-98 transition-transform"
+    >
+      <!-- Thumbnail -->
+      <div class="relative aspect-video bg-dark-300">
+        <img
+          *ngIf="course.coverImageUrl"
+          [src]="course.coverImageUrl"
+          class="w-full h-full object-cover"
+          loading="lazy"
+        />
+        <div class="absolute inset-0 flex items-center justify-center">
+          <ion-icon name="play-circle-outline" class="text-white opacity-70" style="font-size: 48px;"></ion-icon>
+        </div>
+        <div class="absolute top-2 right-2">
+          <span class="bg-black bg-opacity-60 text-white text-xs px-2 py-1 rounded-lg">
+            {{ course.lessonsCount }} lessons
+          </span>
+        </div>
+        <div *ngIf="course.isFree" class="absolute top-2 left-2">
+          <span class="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-lg">FREE</span>
+        </div>
+      </div>
+
+      <!-- Info -->
+      <div class="p-4">
+        <div class="flex items-start justify-between">
+          <div class="flex-1 min-w-0">
+            <h3 class="text-white font-bold text-sm leading-tight mb-1">{{ course.title }}</h3>
+            <p class="text-gray-500 text-xs">{{ course.instructor?.displayName }}</p>
+          </div>
+          <ion-button fill="clear" size="small" color="medium">
+            <ion-icon slot="icon-only" name="bookmark-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+        <div class="flex items-center gap-3 mt-3">
+          <!-- Rating -->
+          <div class="flex items-center gap-1">
+            <ion-icon name="star" class="text-yellow-400 text-sm"></ion-icon>
+            <span class="text-white text-xs font-semibold">{{ course.rating.toFixed(1) }}</span>
+            <span class="text-gray-500 text-xs">({{ course.ratingsCount }})</span>
+          </div>
+
+          <!-- Duration -->
+          <span class="text-gray-600 text-xs">·</span>
+          <span class="text-gray-500 text-xs">{{ formatDuration(course.totalDuration) }}</span>
+
+          <!-- Level -->
+          <span class="text-gray-600 text-xs">·</span>
+          <span class="text-gray-500 text-xs capitalize">{{ course.level }}</span>
+        </div>
+
+        <!-- Price -->
+        <div class="flex items-center justify-between mt-3 pt-3 border-t border-dark-300">
+          <span class="text-white font-bold">
+            {{ course.isFree ? 'Free' : '$' + course.price }}
+          </span>
+          <span class="text-gray-500 text-xs">{{ course.enrolledCount }} enrolled</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="courses.length === 0" class="flex flex-col items-center py-16">
+      <ion-icon name="play-circle-outline" class="text-gray-700 text-5xl mb-4"></ion-icon>
+      <p class="text-white font-semibold mb-2">No courses yet</p>
+      <p class="text-gray-500 text-sm text-center">Masterclasses will be available soon.</p>
+    </div>
+  </div>
+
+</ion-content>

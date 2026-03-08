@@ -1,0 +1,225 @@
+// Tailwind CSS directives
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// Ionic global styles
+@import "@ionic/angular/css/core.css";
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+// ============================================
+// RHYTHM CULTURE GLOBAL STYLES
+// ============================================
+
+* {
+  box-sizing: border-box;
+}
+
+// Base body
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #0A0A0A;
+  color: #FFFFFF;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #1A1A1A;
+}
+::-webkit-scrollbar-thumb {
+  background: #3A3A3A;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0066FF;
+}
+
+// ============================================
+// TAILWIND COMPONENT LAYER
+// ============================================
+@layer components {
+  // Buttons
+  .btn-primary {
+    @apply bg-primary-500 text-white font-semibold px-6 py-3 rounded-xl
+           transition-all duration-200 active:scale-95
+           hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-dark-200 text-white font-semibold px-6 py-3 rounded-xl
+           border border-dark-300 transition-all duration-200 active:scale-95
+           hover:bg-dark-300 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-outline {
+    @apply bg-transparent text-primary-500 font-semibold px-6 py-3 rounded-xl
+           border border-primary-500 transition-all duration-200 active:scale-95
+           hover:bg-primary-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-white font-medium px-4 py-2 rounded-lg
+           transition-all duration-200 active:scale-95 hover:bg-dark-200;
+  }
+
+  // Cards
+  .card {
+    @apply bg-surface-card rounded-2xl overflow-hidden;
+  }
+
+  .card-bordered {
+    @apply bg-surface-card rounded-2xl overflow-hidden border border-dark-300;
+  }
+
+  // Inputs
+  .input-field {
+    @apply w-full bg-surface-input text-white placeholder-gray-500
+           border border-dark-300 rounded-xl px-4 py-3
+           focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500
+           transition-colors duration-200;
+  }
+
+  // Avatar
+  .avatar {
+    @apply rounded-full object-cover bg-dark-200;
+  }
+
+  .avatar-sm { @apply w-8 h-8; }
+  .avatar-md { @apply w-10 h-10; }
+  .avatar-lg { @apply w-14 h-14; }
+  .avatar-xl { @apply w-20 h-20; }
+
+  // Badge / specialty pill
+  .specialty-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
+           bg-primary-500 bg-opacity-20 text-primary-300 border border-primary-500 border-opacity-30;
+  }
+
+  // Section header
+  .section-header {
+    @apply text-xl font-bold text-white mb-4;
+  }
+
+  // Divider
+  .divider {
+    @apply border-t border-dark-300 my-4;
+  }
+
+  // Loading skeleton
+  .skeleton {
+    @apply bg-dark-200 rounded animate-pulse;
+  }
+
+  // Tab bar override
+  .rc-tab-bar {
+    @apply bg-dark-100 border-t border-dark-300;
+  }
+}
+
+// ============================================
+// IONIC COMPONENT OVERRIDES
+// ============================================
+
+// Dark theme
+ion-content {
+  --background: #0A0A0A;
+  --color: #FFFFFF;
+}
+
+ion-toolbar {
+  --background: #0A0A0A;
+  --color: #FFFFFF;
+  --border-color: #2A2A2A;
+}
+
+ion-tab-bar {
+  --background: #111111;
+  --border: 1px solid #2A2A2A;
+}
+
+ion-tab-button {
+  --color: #6B7280;
+  --color-selected: #0066FF;
+}
+
+ion-item {
+  --background: transparent;
+  --color: #FFFFFF;
+  --border-color: #2A2A2A;
+}
+
+ion-input {
+  --color: #FFFFFF;
+  --placeholder-color: #6B7280;
+  --background: #222222;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --border-radius: 12px;
+}
+
+ion-textarea {
+  --color: #FFFFFF;
+  --placeholder-color: #6B7280;
+  --background: #222222;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --border-radius: 12px;
+}
+
+ion-button {
+  --border-radius: 12px;
+  font-weight: 600;
+
+  &.button-primary {
+    --background: #0066FF;
+    --background-hover: #0052CC;
+    --background-activated: #003D99;
+  }
+}
+
+ion-card {
+  --background: #1A1A1A;
+  --color: #FFFFFF;
+  margin: 0;
+  border-radius: 16px;
+  box-shadow: none;
+}
+
+ion-refresher {
+  --color: #0066FF;
+}
+
+ion-skeleton-text {
+  --background: #1A1A1A;
+  --background-rgb: 26, 26, 26;
+}
+
+ion-chip {
+  --background: rgba(0, 102, 255, 0.15);
+  --color: #7EB3FF;
+}
+
+ion-badge {
+  --background: #0066FF;
+  --color: #FFFFFF;
+}
+
+// Prevent text selection on interactive elements
+ion-button, ion-tab-button, ion-item {
+  -webkit-user-select: none;
+  user-select: none;
+}

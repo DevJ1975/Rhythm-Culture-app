@@ -1,0 +1,39 @@
+<ion-tabs>
+  <ion-tab-bar slot="bottom" class="rc-tab-bar">
+
+    <!-- Feed -->
+    <ion-tab-button tab="feed" href="/tabs/feed">
+      <ion-icon name="home-outline"></ion-icon>
+      <ion-label>Feed</ion-label>
+    </ion-tab-button>
+
+    <!-- Discover -->
+    <ion-tab-button tab="discover" href="/tabs/discover">
+      <ion-icon name="search-outline"></ion-icon>
+      <ion-label>Discover</ion-label>
+    </ion-tab-button>
+
+    <!-- Create (center accent button) -->
+    <ion-tab-button tab="create" href="/tabs/create" class="create-tab">
+      <div class="create-btn">
+        <ion-icon name="add-circle" class="text-white" style="font-size: 38px;"></ion-icon>
+      </div>
+    </ion-tab-button>
+
+    <!-- Masterclass -->
+    <ion-tab-button tab="masterclass" href="/tabs/masterclass">
+      <ion-icon name="play-circle-outline"></ion-icon>
+      <ion-label>Learn</ion-label>
+    </ion-tab-button>
+
+    <!-- Profile -->
+    <ion-tab-button tab="profile" href="/tabs/profile">
+      <ion-icon name="person-outline"></ion-icon>
+      <ion-label>Profile</ion-label>
+      <ion-badge *ngIf="unreadNotifications > 0" color="danger">
+        {{ unreadNotifications > 9 ? '9+' : unreadNotifications }}
+      </ion-badge>
+    </ion-tab-button>
+
+  </ion-tab-bar>
+</ion-tabs>

@@ -1,0 +1,97 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" routerLink="/tabs/feed">
+        <ion-icon name="close-outline" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>New Post</ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        fill="solid"
+        color="primary"
+        (click)="onPost()"
+        [disabled]="isPosting || (selectedMedia.length === 0 && !form.value.caption?.trim())"
+        style="--border-radius: 10px;"
+      >
+        <ion-spinner *ngIf="isPosting" name="crescent" class="w-4 h-4 mr-1"></ion-spinner>
+        <span class="font-bold">Post</span>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" fullscreen>
+
+  <!-- Upload progress -->
+  <div *ngIf="isPosting && uploadProgress > 0 && uploadProgress < 100" class="mb-4">
+    <div class="flex justify-between mb-1">
+      <span class="text-gray-400 text-xs">Uploading...</span>
+      <span class="text-primary-400 text-xs">{{ uploadProgress | number:'1.0-0' }}%</span>
+    </div>
+    <div class="h-1 bg-dark-300 rounded-full overflow-hidden">
+      <div class="h-full bg-primary-500 transition-all" [style.width]="uploadProgress + '%'"></div>
+    </div>
+  </div>
+
+  <!-- Media preview -->
+  <div *ngIf="selectedMedia.length > 0" class="flex gap-2 mb-4 overflow-x-auto">
+    <div
+      *ngFor="let media of selectedMedia; let i = index"
+      class="relative flex-shrink-0 w-32 h-32 rounded-xl overflow-hidden bg-dark-200"
+    >
+      <img [src]="media.url" class="w-full h-full object-cover" />
+      <button
+        (click)="removeMedia(i)"
+        class="absolute top-1 right-1 w-6 h-6 bg-black bg-opacity-60 rounded-full flex items-center justify-center"
+      >
+        <ion-icon name="close-outline" class="text-white text-sm"></ion-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Caption -->
+  <ion-textarea
+    [formControl]="$any(form.get('caption'))"
+    placeholder="Share your performance, thoughts, or announcement..."
+    rows="6"
+    autoGrow="true"
+    class="text-white text-base leading-relaxed mb-4"
+    style="--color: white; --placeholder-color: #4A4A4A;"
+  ></ion-textarea>
+
+  <!-- Tags input -->
+  <div class="mb-4">
+    <div class="flex items-center gap-2 mb-2">
+      <input
+        [(ngModel)]="tagInput"
+        (keydown.enter)="addTag()"
+        placeholder="Add tags (press Enter)"
+        class="flex-1 bg-dark-200 text-white text-sm placeholder-gray-600 px-3 py-2 rounded-xl border border-dark-300 focus:outline-none focus:border-primary-500"
+      />
+      <button (click)="addTag()" class="text-primary-400 text-sm font-semibold px-3 py-2">Add</button>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <ion-chip *ngFor="let tag of tags" (click)="removeTag(tag)" class="text-xs">
+        #{{ tag }}
+        <ion-icon name="close-outline" class="ml-1"></ion-icon>
+      </ion-chip>
+    </div>
+  </div>
+
+  <!-- Media action buttons -->
+  <div class="flex gap-3 pt-4 border-t border-dark-300">
+    <button
+      (click)="addPhoto()"
+      class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-dark-200 text-gray-400 text-sm"
+    >
+      <ion-icon name="image-outline" class="text-primary-400"></ion-icon>
+      Photo / Video
+    </button>
+    <button class="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-dark-200 text-gray-400 text-sm">
+      <ion-icon name="mic-outline" class="text-purple-400"></ion-icon>
+      Audio
+    </button>
+  </div>
+
+</ion-content>

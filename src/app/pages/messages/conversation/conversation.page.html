@@ -1,0 +1,62 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button fill="clear" (click)="history.back()">
+        <ion-icon name="chevron-back-outline" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <div class="flex items-center gap-2 flex-1 min-w-0">
+      <ion-avatar class="w-8 h-8">
+        <img src="assets/images/default-avatar.png" class="w-full h-full object-cover" />
+      </ion-avatar>
+      <span class="text-white font-semibold text-sm truncate">Artist</span>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="messages-content" #content>
+  <div class="flex flex-col gap-2 px-4 py-4 pb-6">
+    <div
+      *ngFor="let msg of messages; trackBy: trackById"
+      class="flex"
+      [class.justify-end]="isOwnMessage(msg)"
+      [class.justify-start]="!isOwnMessage(msg)"
+    >
+      <div
+        class="max-w-[75%] px-4 py-3 rounded-2xl"
+        [class]="isOwnMessage(msg)
+          ? 'bg-primary-500 text-white rounded-br-sm'
+          : 'bg-dark-200 text-white rounded-bl-sm'"
+      >
+        <p class="text-sm m-0 leading-relaxed">{{ msg.text }}</p>
+        <p class="text-xs opacity-60 mt-1 m-0 text-right">{{ formatTime(msg.createdAt) }}</p>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="messages.length === 0" class="flex flex-col items-center py-12 text-center">
+      <p class="text-gray-500 text-sm">No messages yet. Say hello!</p>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <div class="flex items-end gap-2 px-3 py-2 bg-dark-100 border-t border-dark-300">
+    <ion-button fill="clear" color="medium" size="small">
+      <ion-icon slot="icon-only" name="image-outline"></ion-icon>
+    </ion-button>
+    <div class="flex-1 bg-dark-200 rounded-2xl px-4 py-2 min-h-10">
+      <ion-textarea
+        [(ngModel)]="messageText"
+        placeholder="Message..."
+        rows="1"
+        autoGrow="true"
+        style="--color: white; --placeholder-color: #6B7280; font-size: 14px;"
+        (keydown.enter)="sendMessage()"
+      ></ion-textarea>
+    </div>
+    <ion-button fill="clear" color="primary" size="small" (click)="sendMessage()" [disabled]="!messageText.trim() || isSending">
+      <ion-icon slot="icon-only" name="send-outline"></ion-icon>
+    </ion-button>
+  </div>
+</ion-footer>

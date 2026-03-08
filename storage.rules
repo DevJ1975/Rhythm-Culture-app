@@ -1,0 +1,72 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isVideo() {
+      return request.resource.contentType.matches('video/.*');
+    }
+
+    function isAudio() {
+      return request.resource.contentType.matches('audio/.*');
+    }
+
+    function isSmallFile() {
+      return request.resource.size < 5 * 1024 * 1024; // 5MB
+    }
+
+    function isMediumFile() {
+      return request.resource.size < 50 * 1024 * 1024; // 50MB
+    }
+
+    function isLargeFile() {
+      return request.resource.size < 500 * 1024 * 1024; // 500MB
+    }
+
+    // Profile photos
+    match /users/{userId}/profile/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(userId) && isImage() && isSmallFile();
+    }
+
+    // Post media
+    match /posts/{userId}/{postId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(userId) && (
+        (isImage() && isMediumFile()) ||
+        (isVideo() && isLargeFile()) ||
+        (isAudio() && isMediumFile())
+      );
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+
+    // Course content
+    match /courses/{instructorId}/{courseId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(instructorId) && (
+        (isImage() && isMediumFile()) ||
+        (isVideo() && isLargeFile())
+      );
+      allow delete: if isAuthenticated() && isOwner(instructorId);
+    }
+
+    // Event media
+    match /events/{organizerId}/{eventId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(organizerId) && (isImage() && isMediumFile());
+      allow delete: if isAuthenticated() && isOwner(organizerId);
+    }
+  }
+}

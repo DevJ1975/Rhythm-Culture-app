@@ -1,0 +1,7 @@
+{
+  "name": "Rhythm Culture",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

@@ -1,0 +1,66 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      <span class="text-primary-400 font-black">Rhythm</span>
+      <span class="text-white font-black"> Culture</span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/messages" fill="clear">
+        <ion-icon name="chatbubbles-outline" class="text-white"></ion-icon>
+      </ion-button>
+      <ion-button routerLink="/notifications" fill="clear">
+        <ion-icon name="notifications-outline" class="text-white"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+
+  <ion-refresher slot="fixed" (ionRefresh)="onRefresh($event)">
+    <ion-refresher-content pullingIcon="lines" refreshingSpinner="crescent"></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Skeleton loaders -->
+  <ng-container *ngIf="isLoading && posts.length === 0">
+    <div *ngFor="let i of [1,2,3]" class="mb-1">
+      <div class="flex items-center gap-3 px-4 py-4">
+        <ion-skeleton-text animated class="w-10 h-10 rounded-full"></ion-skeleton-text>
+        <div class="flex-1">
+          <ion-skeleton-text animated style="width: 40%; height: 14px;" class="rounded mb-1"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 25%; height: 12px;" class="rounded"></ion-skeleton-text>
+        </div>
+      </div>
+      <ion-skeleton-text animated style="width: 100%; height: 300px;"></ion-skeleton-text>
+      <div class="flex gap-4 px-4 py-3">
+        <ion-skeleton-text animated style="width: 60px; height: 28px;" class="rounded-full"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 60px; height: 28px;" class="rounded-full"></ion-skeleton-text>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Empty state -->
+  <app-empty-state
+    *ngIf="!isLoading && posts.length === 0"
+    icon="film-outline"
+    title="No posts yet"
+    message="Follow artists to see their performances, dance routines, and music here."
+  ></app-empty-state>
+
+  <!-- Posts feed -->
+  <div *ngIf="posts.length > 0">
+    <app-post-card
+      *ngFor="let post of posts; trackBy: trackByPostId"
+      [post]="post"
+    ></app-post-card>
+  </div>
+
+  <!-- Infinite scroll -->
+  <ion-infinite-scroll [disabled]="!hasMore" (ionInfinite)="onInfiniteScroll($event)">
+    <ion-infinite-scroll-content
+      loadingText="Loading more..."
+      loadingSpinner="crescent"
+    ></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+
+</ion-content>
