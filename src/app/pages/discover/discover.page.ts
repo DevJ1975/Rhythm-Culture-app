@@ -8,7 +8,7 @@ import {
   IonAvatar, IonButton, IonIcon, IonChip, IonSkeletonText,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { searchOutline, filterOutline } from 'ionicons/icons';
+import { searchOutline, filterOutline, trophyOutline, chevronForwardOutline } from 'ionicons/icons';
 import { UserProfile, ArtistSpecialty } from '../../models';
 import { UserService } from '../../core/services/user.service';
 import { CollaborationService } from '../../core/services/collaboration.service';
@@ -45,7 +45,7 @@ export class DiscoverPage implements OnInit {
   selectedSpecialty: ArtistSpecialty | null = null;
 
   constructor() {
-    addIcons({ searchOutline, filterOutline });
+    addIcons({ searchOutline, filterOutline, trophyOutline, chevronForwardOutline });
   }
 
   ngOnInit(): void {

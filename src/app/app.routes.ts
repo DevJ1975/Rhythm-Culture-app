@@ -165,6 +165,15 @@ export const routes: Routes = [
         (m) => m.PostDetailPage
       ),
   },
+  // ── History & Culture ──────────────────────────────────────────────────────
+  {
+    path: 'history/african-americans-cs',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/history/african-americans-cs/african-americans-cs.page').then(
+        (m) => m.AfricanAmericansCsPage
+      ),
+  },
   // ── Fallback ──────────────────────────────────────────────────────────────
   {
     path: '**',

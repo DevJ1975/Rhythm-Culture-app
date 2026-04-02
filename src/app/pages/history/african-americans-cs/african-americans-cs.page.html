@@ -1,0 +1,93 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/feed"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Black History in CS</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <h1 class="hero-title">African Americans in Computer Science</h1>
+    <p class="hero-subtitle">
+      From NASA's "Hidden Figures" to AI ethics pioneers, African Americans have shaped every
+      era of computing — inventing core technologies, breaking academic barriers, and building
+      the digital world we live in today.
+    </p>
+  </div>
+
+  <!-- Timeline -->
+  <ion-accordion-group [multiple]="true" [value]="['era-0', 'era-1', 'era-2', 'era-3', 'era-4']">
+    <ion-accordion *ngFor="let era of eras; let i = index" [value]="'era-' + i">
+      <ion-item slot="header" class="era-header" lines="none">
+        <ion-icon [name]="era.icon" slot="start" class="era-icon"></ion-icon>
+        <ion-label>
+          <h2 class="era-title">{{ era.title }}</h2>
+          <p class="era-period">{{ era.period }}</p>
+        </ion-label>
+      </ion-item>
+
+      <div slot="content" class="era-content">
+        <p class="era-summary">{{ era.summary }}</p>
+
+        <!-- Pioneers -->
+        <h3 class="section-heading">Pioneers</h3>
+        <ion-card *ngFor="let pioneer of era.pioneers" class="pioneer-card">
+          <ion-card-header>
+            <ion-card-title class="pioneer-name">{{ pioneer.name }}</ion-card-title>
+            <ion-card-subtitle>
+              <span class="pioneer-years">{{ pioneer.years }}</span>
+              <ion-chip class="role-chip">
+                <ion-label>{{ pioneer.role }}</ion-label>
+              </ion-chip>
+            </ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <p class="pioneer-achievement">{{ pioneer.achievement }}</p>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- Milestones -->
+        <h3 class="section-heading">Key Milestones</h3>
+        <div class="milestones-list">
+          <div *ngFor="let milestone of era.milestones" class="milestone-item">
+            <div class="milestone-dot"></div>
+            <p class="milestone-text">{{ milestone }}</p>
+          </div>
+        </div>
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>
+
+  <!-- Call to Action -->
+  <div class="cta-section">
+    <h2 class="cta-title">The Journey Continues</h2>
+    <p class="cta-text">
+      The contributions of African Americans in computer science are vast and ongoing.
+      From the earliest days of computation to the cutting edge of artificial intelligence,
+      Black innovators have been indispensable to the story of technology.
+      At Rhythm Culture, we celebrate this legacy and the deep connection between
+      technology and the performing arts.
+    </p>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-number">1949</span>
+        <span class="stat-label">First Black woman math Ph.D. (Yale)</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">1969</span>
+        <span class="stat-label">First Black CS Ph.D. earned</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">200+</span>
+        <span class="stat-label">Patents held by Marian Croak</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">9</span>
+        <span class="stat-label">IBM PC patents by Mark Dean</span>
+      </div>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,31 @@
+:host{--s:#1a1a1a;--l:#2a2a2a;--p:#0066ff;--g:#d4a017;--t:#b0b0b0}
+ion-content{--background:#0a0a0a}
+ion-toolbar{--background:#0a0a0a;--color:#fff}
+.hero-section{text-align:center;padding:32px 16px 40px;border-bottom:1px solid var(--l);margin-bottom:24px}
+.hero-title{font-size:28px;font-weight:800;color:#fff;margin:0 0 16px;line-height:1.2}
+.hero-subtitle{font-size:15px;color:var(--t);line-height:1.6;max-width:600px;margin:0 auto}
+.era-header{--background:var(--s);--color:#fff;--border-radius:12px;margin-bottom:8px}
+.era-icon{font-size:24px;color:var(--g)}
+.era-title{font-size:18px;font-weight:700;color:#fff}
+.era-period{font-size:13px;color:var(--g);font-weight:600}
+.era-content{padding:16px 8px}
+.era-summary{font-size:14px;color:var(--t);line-height:1.6;margin-bottom:24px;padding:0 8px}
+.section-heading{font-size:16px;font-weight:700;color:var(--g);margin:24px 8px 12px;text-transform:uppercase;letter-spacing:1px}
+.pioneer-card{--background:var(--s);--color:#fff;border-radius:12px;margin:0 0 12px;border-left:3px solid var(--p)}
+.pioneer-name{font-size:18px;font-weight:700;color:#fff}
+.pioneer-years{font-size:13px;color:var(--t);margin-right:8px}
+.role-chip{--background:var(--p);--color:#fff;font-size:11px;height:24px;margin-top:4px}
+.pioneer-achievement{font-size:14px;color:var(--t);line-height:1.6}
+.milestones-list{padding:0 8px}
+.milestone-item{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
+.milestone-dot{width:10px;height:10px;min-width:10px;border-radius:50%;background:var(--g);margin-top:5px}
+.milestone-text{font-size:14px;color:var(--t);line-height:1.5;margin:0}
+.cta-section{text-align:center;padding:40px 16px;margin-top:24px;border-top:1px solid var(--l)}
+.cta-title{font-size:24px;font-weight:800;color:#fff;margin:0 0 16px}
+.cta-text{font-size:14px;color:var(--t);line-height:1.6;max-width:600px;margin:0 auto 32px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:500px;margin:0 auto}
+.stat-card{background:var(--s);border-radius:12px;padding:20px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;border:1px solid var(--l)}
+.stat-number{font-size:28px;font-weight:800;color:var(--g)}
+.stat-label{font-size:12px;color:var(--t);text-align:center;line-height:1.4}
+ion-accordion{background:transparent;margin-bottom:8px}
+ion-accordion::part(content){background:transparent}
