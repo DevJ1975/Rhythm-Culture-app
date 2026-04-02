@@ -1,16 +1,22 @@
 // Development environment configuration
-// Replace placeholder values with your actual Firebase project configuration
+// Using Firebase Local Emulator Suite for local dev (no real Firebase project needed).
+// The 'demo-' prefix tells the Firebase SDK to ONLY connect to local emulators.
+// Replace these with your real Firebase config when ready.
 export const environment = {
   production: false,
-  firebase: {
-    apiKey: 'YOUR_API_KEY',
-    authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT_ID.appspot.com',
-    messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-    appId: 'YOUR_APP_ID',
-    measurementId: 'YOUR_MEASUREMENT_ID',
+  demoCredentials: {
+    email: 'demo@rhythmculture.app',
+    password: 'Demo1234!',
   },
-  useEmulators: false,
+  firebase: {
+    apiKey: 'demo-key',
+    authDomain: 'demo-rhythm-culture.firebaseapp.com',
+    projectId: 'demo-rhythm-culture',
+    storageBucket: 'demo-rhythm-culture.appspot.com',
+    messagingSenderId: '000000000000',
+    appId: '1:000000000000:web:0000000000000000',
+    measurementId: 'G-00000000',
+  },
+  useEmulators: true,
   appVersion: '1.0.0',
 };

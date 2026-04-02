@@ -110,6 +110,21 @@
       </div>
     </div>
 
+    <!-- Dev-only demo login -->
+    <div *ngIf="isDev" class="mt-6 pt-6 border-t border-dashed border-dark-300">
+      <p class="text-center text-gray-600 text-xs mb-3 uppercase tracking-widest">Dev Only</p>
+      <ion-button
+        expand="block"
+        fill="outline"
+        (click)="onDemoLogin()"
+        [disabled]="isLoading"
+        style="--border-radius: 14px; --border-color: #3A3A3A; --color: #6B7280;"
+      >
+        <ion-icon name="flash-outline" slot="start"></ion-icon>
+        Demo Login
+      </ion-button>
+    </div>
+
     <!-- Register link -->
     <div class="flex items-center justify-center pb-12 pt-8">
       <span class="text-gray-500 text-sm">Don't have an account?</span>

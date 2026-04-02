@@ -21,5 +21,6 @@ export class AppComponent implements OnInit {
         await this.notificationService.initPushNotifications(user.uid);
       }
     });
+
   }
 }

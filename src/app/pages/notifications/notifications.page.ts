@@ -13,6 +13,8 @@ import {
 import { Notification, NotificationType } from '../../models';
 import { NotificationService } from '../../core/services/notification.service';
 import { AuthService } from '../../core/services/auth.service';
+import { MockDataService } from '../../core/services/mock-data.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-notifications',
@@ -28,6 +30,7 @@ import { AuthService } from '../../core/services/auth.service';
 export class NotificationsPage implements OnInit {
   private notifService = inject(NotificationService);
   private authService = inject(AuthService);
+  private mockData = inject(MockDataService);
 
   notifications: Notification[] = [];
   isLoading = true;
@@ -37,6 +40,11 @@ export class NotificationsPage implements OnInit {
   }
 
   ngOnInit(): void {
+    if (!environment.production) {
+      this.notifications = this.mockData.getNotifications();
+      this.isLoading = false;
+      return;
+    }
     const uid = this.authService.currentUser?.uid;
     if (!uid) return;
     this.notifService.getAllNotifications(uid).subscribe((notifs) => {

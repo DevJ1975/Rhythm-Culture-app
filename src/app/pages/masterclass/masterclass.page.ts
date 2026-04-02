@@ -10,6 +10,8 @@ import { addIcons } from 'ionicons';
 import { starOutline, star, playCircleOutline, bookmarkOutline } from 'ionicons/icons';
 import { Course } from '../../models';
 import { CourseService } from '../../core/services/course.service';
+import { MockDataService } from '../../core/services/mock-data.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-masterclass',
@@ -24,6 +26,7 @@ import { CourseService } from '../../core/services/course.service';
 })
 export class MasterclassPage implements OnInit {
   private courseService = inject(CourseService);
+  private mockData = inject(MockDataService);
 
   courses: Course[] = [];
   isLoading = true;
@@ -42,6 +45,11 @@ export class MasterclassPage implements OnInit {
   async loadCourses(): Promise<void> {
     this.isLoading = true;
     try {
+      if (!environment.production) {
+        const cat = this.activeCategory !== 'all' ? this.activeCategory : undefined;
+        this.courses = this.mockData.getCourses(cat);
+        return;
+      }
       const filters = this.activeCategory !== 'all' ? { category: this.activeCategory } : {};
       const result = await this.courseService.getCourses(filters as any);
       this.courses = result.courses;

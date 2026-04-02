@@ -12,9 +12,13 @@ import { notificationsOutline, chatbubblesOutline, addOutline } from 'ionicons/i
 import { Post } from '../../models';
 import { PostService } from '../../core/services/post.service';
 import { AuthService } from '../../core/services/auth.service';
+import { MockDataService } from '../../core/services/mock-data.service';
 import { PostCardComponent } from '../../shared/components/post-card/post-card.component';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { StoriesStripComponent } from '../../shared/components/stories-strip/stories-strip.component';
+import { MockStory } from '../../core/services/mock-data.service';
 import { QueryDocumentSnapshot } from '@angular/fire/firestore';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-feed',
@@ -26,14 +30,16 @@ import { QueryDocumentSnapshot } from '@angular/fire/firestore';
     IonHeader, IonToolbar, IonTitle, IonContent, IonButton, IonIcon,
     IonRefresher, IonRefresherContent, IonInfiniteScroll,
     IonInfiniteScrollContent, IonSkeletonText, IonButtons, IonBadge,
-    PostCardComponent, EmptyStateComponent,
+    PostCardComponent, EmptyStateComponent, StoriesStripComponent,
   ],
 })
 export class FeedPage implements OnInit {
   private postService = inject(PostService);
   private authService = inject(AuthService);
+  private mockData = inject(MockDataService);
 
   posts: Post[] = [];
+  stories: MockStory[] = [];
   isLoading = true;
   hasMore = true;
   private lastDoc: QueryDocumentSnapshot | null = null;
@@ -44,6 +50,9 @@ export class FeedPage implements OnInit {
 
   ngOnInit(): void {
     this.loadPosts();
+    if (!environment.production) {
+      this.stories = this.mockData.getStories();
+    }
   }
 
   async loadPosts(reset = false): Promise<void> {
@@ -53,6 +62,11 @@ export class FeedPage implements OnInit {
     }
     this.isLoading = true;
     try {
+      if (!environment.production) {
+        this.posts = this.mockData.getFeedPosts();
+        this.hasMore = false;
+        return;
+      }
       const result = await this.postService.getFeedPosts(10, this.lastDoc ?? undefined);
       if (reset) {
         this.posts = result.posts;

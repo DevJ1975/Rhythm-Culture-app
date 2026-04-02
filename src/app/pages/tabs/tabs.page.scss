@@ -1,0 +1,41 @@
+.rc-tab-bar {
+  --background: #0f0f0f;
+  --border: none;
+  border-top: 1px solid #1a1a1a;
+
+  ion-tab-button {
+    --color: #555;
+    --color-selected: #6366f1;
+    --background: transparent;
+  }
+}
+
+.create-tab {
+  --color: transparent;
+  --color-selected: transparent;
+  --ripple-color: transparent;
+  position: relative;
+  overflow: visible !important;
+
+  // Push neighbouring tabs outward to give the raised button room
+  flex: 1.2;
+}
+
+.create-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.45);
+  // Raise the button above the tab bar
+  margin-bottom: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:active {
+    transform: scale(0.93);
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+  }
+}

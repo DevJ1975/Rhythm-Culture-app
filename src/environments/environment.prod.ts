@@ -1,6 +1,7 @@
 // Production environment configuration
 export const environment = {
   production: true,
+  demoCredentials: { email: '', password: '' },
   firebase: {
     apiKey: 'YOUR_PROD_API_KEY',
     authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',

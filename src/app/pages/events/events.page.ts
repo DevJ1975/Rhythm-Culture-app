@@ -10,6 +10,8 @@ import { addIcons } from 'ionicons';
 import { calendarOutline, locationOutline, addOutline, globeOutline } from 'ionicons/icons';
 import { Event, EventCategory } from '../../models';
 import { EventService } from '../../core/services/event.service';
+import { MockDataService } from '../../core/services/mock-data.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-events',
@@ -24,6 +26,7 @@ import { EventService } from '../../core/services/event.service';
 })
 export class EventsPage implements OnInit {
   private eventService = inject(EventService);
+  private mockData = inject(MockDataService);
 
   events: Event[] = [];
   isLoading = true;
@@ -44,10 +47,17 @@ export class EventsPage implements OnInit {
 
   async loadEvents(): Promise<void> {
     this.isLoading = true;
-    const filters = this.selectedCategory ? { category: this.selectedCategory } : {};
-    const result = await this.eventService.getUpcomingEvents(filters);
-    this.events = result.events;
-    this.isLoading = false;
+    try {
+      if (!environment.production) {
+        this.events = this.mockData.getEvents(this.selectedCategory ?? undefined);
+        return;
+      }
+      const filters = this.selectedCategory ? { category: this.selectedCategory } : {};
+      const result = await this.eventService.getUpcomingEvents(filters);
+      this.events = result.events;
+    } finally {
+      this.isLoading = false;
+    }
   }
 
   async filterByCategory(cat: EventCategory): Promise<void> {

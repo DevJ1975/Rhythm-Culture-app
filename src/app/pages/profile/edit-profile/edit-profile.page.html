@@ -15,6 +15,8 @@
   </ion-toolbar>
 </ion-header>
 
+<input #photoInput type="file" accept="image/*" class="hidden" (change)="onPhotoSelected($event)" />
+
 <ion-content class="ion-padding">
   <form [formGroup]="form" (ngSubmit)="onSave()">
 

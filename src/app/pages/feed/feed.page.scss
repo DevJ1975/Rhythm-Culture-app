@@ -1,3 +1,9 @@
 ion-content {
   --background: #0A0A0A;
 }
+
+// On wider screens centre the feed at phone width
+.feed-column {
+  max-width: 480px;
+  margin: 0 auto;
+}

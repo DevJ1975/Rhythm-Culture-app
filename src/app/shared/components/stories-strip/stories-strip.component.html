@@ -1,0 +1,35 @@
+<div class="stories-strip flex gap-4 px-4 py-3 overflow-x-auto">
+
+  <!-- Own story / add story -->
+  <div class="story-item flex flex-col items-center gap-1.5 flex-shrink-0">
+    <div class="story-ring own-ring relative">
+      <img
+        [src]="stories[0]?.photoURL || 'assets/images/default-avatar.png'"
+        class="w-16 h-16 rounded-full object-cover"
+        alt="Your story"
+      />
+      <div class="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-primary-500 flex items-center justify-center border-2 border-dark-DEFAULT">
+        <ion-icon name="add-outline" class="text-white" style="font-size: 11px;"></ion-icon>
+      </div>
+    </div>
+    <span class="text-white text-xs truncate w-16 text-center">Your Story</span>
+  </div>
+
+  <!-- Other stories -->
+  <div
+    *ngFor="let story of stories.slice(1)"
+    class="story-item flex flex-col items-center gap-1.5 flex-shrink-0 cursor-pointer"
+  >
+    <div class="story-ring gradient-ring">
+      <img
+        [src]="story.photoURL"
+        class="w-16 h-16 rounded-full object-cover"
+        [alt]="story.artistName || story.displayName"
+      />
+    </div>
+    <span class="text-gray-300 text-xs truncate w-16 text-center">
+      {{ story.artistName || story.displayName.split(' ')[0] }}
+    </span>
+  </div>
+
+</div>

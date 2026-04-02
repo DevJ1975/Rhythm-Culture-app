@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -9,6 +9,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronBackOutline, cameraOutline, checkmarkOutline } from 'ionicons/icons';
+import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
@@ -38,6 +39,8 @@ export class EditProfilePage implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
+
+  @ViewChild('photoInput') photoInput!: ElementRef<HTMLInputElement>;
 
   profile: UserProfile | null = null;
   isLoading = false;
@@ -95,18 +98,32 @@ export class EditProfilePage implements OnInit {
   }
 
   async changePhoto(): Promise<void> {
-    const photo = await Camera.getPhoto({
-      resultType: CameraResultType.DataUrl,
-      source: CameraSource.Prompt,
-      quality: 80,
-      width: 500,
-      height: 500,
-    });
-    if (!photo.dataUrl || !this.profile) return;
+    if (Capacitor.isNativePlatform()) {
+      const photo = await Camera.getPhoto({
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Prompt,
+        quality: 80,
+        width: 500,
+        height: 500,
+      });
+      if (!photo.dataUrl || !this.profile) return;
+      const blob = await this.storageService.dataUrlToBlob(photo.dataUrl);
+      this.uploadPhoto(blob);
+    } else {
+      this.photoInput.nativeElement.click();
+    }
+  }
 
-    const blob = await this.storageService.dataUrlToBlob(photo.dataUrl);
+  async onPhotoSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length || !this.profile) return;
+    const resized = await this.storageService.resizeImage(input.files[0], 500, 500, 0.8);
+    this.uploadPhoto(resized);
+    input.value = '';
+  }
+
+  private uploadPhoto(blob: Blob): void {
     const uid = this.authService.currentUser!.uid;
-
     this.storageService.uploadProfilePhoto(uid, blob).subscribe(async (prog) => {
       this.uploadProgress = prog.progress;
       if (prog.state === 'success' && prog.downloadURL) {

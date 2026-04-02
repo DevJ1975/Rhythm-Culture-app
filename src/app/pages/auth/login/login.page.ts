@@ -3,14 +3,15 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import {
-  IonContent, IonHeader, IonToolbar, IonTitle, IonButton, IonIcon,
-  IonInput, IonItem, IonLabel, IonNote, IonSpinner, IonText,
-  ToastController, LoadingController,
+  IonContent, IonButton, IonIcon,
+  IonInput, IonLabel, IonNote, IonSpinner,
+  ToastController,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { logoGoogle, logoApple, eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline } from 'ionicons/icons';
+import { logoGoogle, logoApple, eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline, flashOutline } from 'ionicons/icons';
 import { AuthService } from '../../../core/services/auth.service';
 import { Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -19,8 +20,8 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, RouterModule,
-    IonContent, IonButton, IonIcon, IonInput, IonItem,
-    IonLabel, IonNote, IonSpinner, IonText,
+    IonContent, IonButton, IonIcon, IonInput,
+    IonLabel, IonNote, IonSpinner,
   ],
 })
 export class LoginPage {
@@ -28,7 +29,6 @@ export class LoginPage {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
-  private loadingCtrl = inject(LoadingController);
 
   showPassword = false;
   isLoading = false;
@@ -38,8 +38,16 @@ export class LoginPage {
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
+  readonly isDev = !environment.production;
+
   constructor() {
-    addIcons({ logoGoogle, logoApple, eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline });
+    addIcons({ logoGoogle, logoApple, eyeOutline, eyeOffOutline, mailOutline, lockClosedOutline, flashOutline });
+  }
+
+  async onDemoLogin(): Promise<void> {
+    const { email, password } = environment.demoCredentials;
+    this.loginForm.setValue({ email, password });
+    await this.onEmailLogin();
   }
 
   async onEmailLogin(): Promise<void> {

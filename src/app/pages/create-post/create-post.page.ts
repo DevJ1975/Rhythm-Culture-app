@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -9,6 +9,7 @@ import {
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { closeOutline, imageOutline, videocamOutline, micOutline, checkmarkOutline } from 'ionicons/icons';
+import { Capacitor } from '@capacitor/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { AuthService } from '../../core/services/auth.service';
 import { PostService } from '../../core/services/post.service';
@@ -34,6 +35,8 @@ export class CreatePostPage {
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
 
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
   selectedMedia: { url: string; type: 'image' | 'video'; file?: File | Blob }[] = [];
   isPosting = false;
   uploadProgress = 0;
@@ -49,15 +52,30 @@ export class CreatePostPage {
   }
 
   async addPhoto(): Promise<void> {
-    const photo = await Camera.getPhoto({
-      resultType: CameraResultType.DataUrl,
-      source: CameraSource.Prompt,
-      quality: 85,
-    });
-    if (photo.dataUrl) {
-      const blob = await this.storageService.dataUrlToBlob(photo.dataUrl);
-      this.selectedMedia.push({ url: photo.dataUrl, type: 'image', file: blob });
+    if (Capacitor.isNativePlatform()) {
+      const photo = await Camera.getPhoto({
+        resultType: CameraResultType.DataUrl,
+        source: CameraSource.Prompt,
+        quality: 85,
+      });
+      if (photo.dataUrl) {
+        const blob = await this.storageService.dataUrlToBlob(photo.dataUrl);
+        this.selectedMedia.push({ url: photo.dataUrl, type: 'image', file: blob });
+      }
+    } else {
+      this.fileInput.nativeElement.click();
     }
+  }
+
+  async onFileSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    for (const file of Array.from(input.files)) {
+      const type: 'image' | 'video' = file.type.startsWith('video/') ? 'video' : 'image';
+      const url = URL.createObjectURL(file);
+      this.selectedMedia.push({ url, type, file });
+    }
+    input.value = '';
   }
 
   removeMedia(idx: number): void {

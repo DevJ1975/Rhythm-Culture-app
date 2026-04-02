@@ -18,7 +18,9 @@ import { UserProfile, Post } from '../../models';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { PostService } from '../../core/services/post.service';
+import { MockDataService } from '../../core/services/mock-data.service';
 import { SpecialtyBadgeComponent } from '../../shared/components/specialty-badge/specialty-badge.component';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-profile',
@@ -37,6 +39,7 @@ export class ProfilePage implements OnInit {
   private authService = inject(AuthService);
   private userService = inject(UserService);
   private postService = inject(PostService);
+  private mockData = inject(MockDataService);
   private route = inject(ActivatedRoute);
 
   profile: UserProfile | null = null;
@@ -58,15 +61,22 @@ export class ProfilePage implements OnInit {
 
   ngOnInit(): void {
     const uidParam = this.route.snapshot.paramMap.get('uid');
-    const currentUid = this.authService.currentUser?.uid ?? '';
-    this.profileUid = uidParam ?? currentUid;
-    this.isOwnProfile = this.profileUid === currentUid;
+    const ownUid = !environment.production
+      ? this.mockData.getOwnProfileUid()
+      : (this.authService.currentUser?.uid ?? '');
+    this.profileUid = uidParam ?? ownUid;
+    this.isOwnProfile = this.profileUid === ownUid;
     this.loadProfile();
   }
 
   async loadProfile(): Promise<void> {
     this.isLoading = true;
     try {
+      if (!environment.production) {
+        this.profile = this.mockData.getProfile(this.profileUid);
+        this.posts = this.mockData.getPostsForUser(this.profileUid);
+        return;
+      }
       this.profile = await this.userService.getUserProfileOnce(this.profileUid);
       if (!this.isOwnProfile) {
         this.isFollowing = await this.userService.isFollowing(

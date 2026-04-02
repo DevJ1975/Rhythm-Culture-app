@@ -21,6 +21,8 @@
   </ion-toolbar>
 </ion-header>
 
+<input #fileInput type="file" accept="image/*,video/*" multiple class="hidden" (change)="onFileSelected($event)" />
+
 <ion-content class="ion-padding" fullscreen>
 
   <!-- Upload progress -->
