@@ -1,0 +1,15 @@
+:host {
+  --ion-background-color: #0a0a0a;
+}
+
+.pipeline-segment {
+  --background: #1a1a1a;
+
+  ion-segment-button {
+    --color: #888;
+    --color-checked: #fff;
+    --indicator-color: #0066FF;
+    font-size: 12px;
+    min-width: 0;
+  }
+}

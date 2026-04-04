@@ -103,6 +103,20 @@
         ></app-specialty-badge>
       </div>
 
+      <!-- GovCon Hub (own profile only) -->
+      <div *ngIf="isOwnProfile" class="mt-4" routerLink="/govcon">
+        <div class="bg-gradient-to-r from-primary-900/50 to-dark-200 rounded-xl p-4 border border-primary-500/30 flex items-center gap-3 active:opacity-80">
+          <div class="w-10 h-10 rounded-xl bg-primary-500/20 flex items-center justify-center">
+            <ion-icon name="briefcase-outline" class="text-primary-400 text-xl"></ion-icon>
+          </div>
+          <div class="flex-1">
+            <p class="text-white text-sm font-semibold m-0">GovCon Hub</p>
+            <p class="text-gray-400 text-xs m-0">Government contracting & SAM.gov</p>
+          </div>
+          <ion-icon name="chevron-back-outline" class="text-gray-500 rotate-180"></ion-icon>
+        </div>
+      </div>
+
       <!-- Stats -->
       <div class="flex gap-6 mt-5 pb-4 border-b border-dark-300">
         <div class="text-center">

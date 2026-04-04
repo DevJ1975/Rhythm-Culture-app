@@ -1,0 +1,141 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/govcon/opportunities" text="" icon="chevron-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Opportunity</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+
+  <!-- Skeleton loading -->
+  <div *ngIf="isLoading" class="px-4 pt-4 space-y-4">
+    <ion-skeleton-text animated style="width: 90%; height: 20px;" class="rounded mb-2"></ion-skeleton-text>
+    <ion-skeleton-text animated style="width: 60%; height: 16px;" class="rounded mb-4"></ion-skeleton-text>
+    <div *ngFor="let i of [1,2,3,4]">
+      <ion-skeleton-text animated style="width: 100%; height: 14px;" class="rounded mb-1"></ion-skeleton-text>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading && opportunity" class="px-4 pt-4 pb-32 space-y-5">
+
+    <!-- Header -->
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-xs px-2 py-0.5 rounded-full bg-primary-500/20 text-primary-400">{{ opportunity.type }}</span>
+        <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400">{{ opportunity.setAside }}</span>
+      </div>
+      <h1 class="text-white font-bold text-xl m-0 leading-tight">{{ opportunity.title }}</h1>
+      <p class="text-gray-400 text-sm m-0 mt-2">{{ opportunity.agency }}<span *ngIf="opportunity.office"> — {{ opportunity.office }}</span></p>
+      <p class="text-gray-500 text-xs m-0 mt-1" *ngIf="opportunity.solicitationNumber">Sol #: {{ opportunity.solicitationNumber }}</p>
+    </div>
+
+    <!-- Key Info Cards -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="bg-surface-card rounded-xl p-3 border border-dark-300">
+        <div class="flex items-center gap-2 mb-1">
+          <ion-icon name="time-outline" class="text-gray-500 text-sm"></ion-icon>
+          <span class="text-gray-500 text-xs">Deadline</span>
+        </div>
+        <p class="text-white text-sm font-medium m-0">{{ formatDate(opportunity.responseDeadline) }}</p>
+        <p class="text-xs m-0 mt-0.5" [class]="getDeadlineColor(opportunity.responseDeadline)">
+          {{ getDaysUntil(opportunity.responseDeadline) }} days left
+        </p>
+      </div>
+      <div class="bg-surface-card rounded-xl p-3 border border-dark-300">
+        <div class="flex items-center gap-2 mb-1">
+          <ion-icon name="cash-outline" class="text-gray-500 text-sm"></ion-icon>
+          <span class="text-gray-500 text-xs">Est. Value</span>
+        </div>
+        <p class="text-white text-sm font-medium m-0">{{ formatCurrency(opportunity.estimatedValue) }}</p>
+      </div>
+      <div class="bg-surface-card rounded-xl p-3 border border-dark-300" *ngIf="opportunity.placeOfPerformance">
+        <div class="flex items-center gap-2 mb-1">
+          <ion-icon name="location-outline" class="text-gray-500 text-sm"></ion-icon>
+          <span class="text-gray-500 text-xs">Location</span>
+        </div>
+        <p class="text-white text-sm font-medium m-0">
+          {{ opportunity.placeOfPerformance?.city ? opportunity.placeOfPerformance.city + ', ' : '' }}{{ opportunity.placeOfPerformance?.state }}
+        </p>
+      </div>
+      <div class="bg-surface-card rounded-xl p-3 border border-dark-300">
+        <div class="flex items-center gap-2 mb-1">
+          <ion-icon name="document-text-outline" class="text-gray-500 text-sm"></ion-icon>
+          <span class="text-gray-500 text-xs">Posted</span>
+        </div>
+        <p class="text-white text-sm font-medium m-0">{{ formatDate(opportunity.postedDate) }}</p>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div>
+      <h3 class="text-white font-semibold text-sm m-0 mb-2">Description</h3>
+      <p class="text-gray-300 text-sm leading-relaxed m-0">{{ opportunity.description }}</p>
+    </div>
+
+    <!-- NAICS Codes -->
+    <div>
+      <h3 class="text-white font-semibold text-sm m-0 mb-2">NAICS Codes</h3>
+      <div class="flex flex-wrap gap-2">
+        <div *ngFor="let code of opportunity.naicsCodes"
+             class="bg-dark-200 rounded-lg px-3 py-2">
+          <p class="text-white text-xs font-medium m-0">{{ code }}</p>
+          <p class="text-gray-500 text-xs m-0">{{ getNaicsDescription(code) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Point of Contact -->
+    <div *ngIf="opportunity.pointOfContact">
+      <h3 class="text-white font-semibold text-sm m-0 mb-2">Point of Contact</h3>
+      <div class="bg-surface-card rounded-xl p-4 border border-dark-300 space-y-2">
+        <div class="flex items-center gap-2" *ngIf="opportunity.pointOfContact?.name">
+          <ion-icon name="person-outline" class="text-gray-500 text-sm"></ion-icon>
+          <span class="text-white text-sm">{{ opportunity.pointOfContact?.name }}</span>
+        </div>
+        <div class="flex items-center gap-2" *ngIf="opportunity.pointOfContact?.email">
+          <ion-icon name="mail-outline" class="text-gray-500 text-sm"></ion-icon>
+          <span class="text-primary-400 text-sm">{{ opportunity.pointOfContact?.email }}</span>
+        </div>
+        <div class="flex items-center gap-2" *ngIf="opportunity.pointOfContact?.phone">
+          <ion-icon name="call-outline" class="text-gray-500 text-sm"></ion-icon>
+          <span class="text-white text-sm">{{ opportunity.pointOfContact?.phone }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Matched Specialties -->
+    <div *ngIf="opportunity.matchedSpecialties?.length">
+      <h3 class="text-white font-semibold text-sm m-0 mb-2">Matched Specialties</h3>
+      <div class="flex flex-wrap gap-2">
+        <span *ngFor="let s of opportunity.matchedSpecialties"
+              class="text-xs px-3 py-1 rounded-full bg-green-500/20 text-green-400">
+          {{ s }}
+        </span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Not found -->
+  <div *ngIf="!isLoading && !opportunity" class="flex flex-col items-center py-16">
+    <ion-icon name="document-text-outline" class="text-gray-700 text-5xl mb-4"></ion-icon>
+    <p class="text-gray-500">Opportunity not found</p>
+  </div>
+
+  <!-- Fixed bottom action bar -->
+  <div *ngIf="!isLoading && opportunity"
+       class="fixed bottom-0 left-0 right-0 bg-dark-DEFAULT border-t border-dark-300 p-4 flex gap-3 z-50">
+    <ion-button expand="block" fill="outline" class="flex-1" (click)="trackOpportunity()"
+                style="--border-radius: 12px; --border-color: rgba(255,255,255,0.2); --color: white;">
+      <ion-icon name="eye-outline" slot="start"></ion-icon>
+      Track
+    </ion-button>
+    <ion-button expand="block" fill="solid" class="flex-1" (click)="startBid()"
+                style="--border-radius: 12px; --background: #0066FF;">
+      <ion-icon name="rocket-outline" slot="start"></ion-icon>
+      Start Bid
+    </ion-button>
+  </div>
+</ion-content>

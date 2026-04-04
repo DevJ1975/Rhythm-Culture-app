@@ -165,6 +165,47 @@ export const routes: Routes = [
         (m) => m.PostDetailPage
       ),
   },
+  // ── GovCon Routes (authenticated) ─────────────────────────────────────────
+  {
+    path: 'govcon',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/govcon/govcon-dashboard/govcon-dashboard.page').then(
+        (m) => m.GovConDashboardPage
+      ),
+  },
+  {
+    path: 'govcon/opportunities',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/govcon/govcon-opportunities/govcon-opportunities.page').then(
+        (m) => m.GovConOpportunitiesPage
+      ),
+  },
+  {
+    path: 'govcon/opportunities/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/govcon/govcon-opportunity-detail/govcon-opportunity-detail.page').then(
+        (m) => m.GovConOpportunityDetailPage
+      ),
+  },
+  {
+    path: 'govcon/pipeline',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/govcon/govcon-pipeline/govcon-pipeline.page').then(
+        (m) => m.GovConPipelinePage
+      ),
+  },
+  {
+    path: 'govcon/profile',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/govcon/govcon-profile/govcon-profile.page').then(
+        (m) => m.GovConProfilePage
+      ),
+  },
   // ── Fallback ──────────────────────────────────────────────────────────────
   {
     path: '**',

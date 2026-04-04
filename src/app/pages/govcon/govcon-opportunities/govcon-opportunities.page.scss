@@ -1,0 +1,17 @@
+:host {
+  --ion-background-color: #0a0a0a;
+}
+
+.custom-searchbar {
+  --background: #1a1a1a;
+  --color: #fff;
+  --placeholder-color: #666;
+  --icon-color: #666;
+  --border-radius: 12px;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}

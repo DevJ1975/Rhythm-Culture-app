@@ -31,5 +31,6 @@ export * from './notifications/on-message-sent';
 export * from './users/on-user-created';
 export * from './posts/on-post-deleted';
 export * from './scheduled/cleanup';
+export * from './govcon/sync-opportunities';
 
 export { db, messaging };
