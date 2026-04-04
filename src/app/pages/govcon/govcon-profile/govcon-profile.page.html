@@ -1,0 +1,199 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/govcon" text="" icon="chevron-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title>GovCon Profile</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="saveProfile()" [disabled]="isSaving">
+        <ion-icon name="save-outline" slot="icon-only" class="text-primary-400"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+
+  <!-- Skeleton loading -->
+  <div *ngIf="isLoading" class="px-4 pt-4 space-y-4">
+    <div *ngFor="let i of [1,2,3,4,5]">
+      <ion-skeleton-text animated style="width: 30%; height: 12px;" class="rounded mb-2"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 100%; height: 40px;" class="rounded"></ion-skeleton-text>
+    </div>
+  </div>
+
+  <div *ngIf="!isLoading" class="px-4 pt-4 pb-32 space-y-6">
+
+    <!-- SAM.gov Registration -->
+    <div>
+      <h2 class="text-white font-bold text-lg m-0 mb-4">SAM.gov Registration</h2>
+      <div class="space-y-4">
+
+        <!-- UEI Number -->
+        <div>
+          <label class="text-gray-400 text-xs font-medium block mb-1">Unique Entity ID (UEI)</label>
+          <div class="bg-surface-input rounded-xl">
+            <ion-input
+              [(ngModel)]="profile.ueiNumber"
+              placeholder="Enter your UEI number"
+              class="govcon-input"
+            ></ion-input>
+          </div>
+        </div>
+
+        <!-- CAGE Code -->
+        <div>
+          <label class="text-gray-400 text-xs font-medium block mb-1">CAGE Code</label>
+          <div class="bg-surface-input rounded-xl">
+            <ion-input
+              [(ngModel)]="profile.cageCode"
+              placeholder="e.g. 8ABC9"
+              class="govcon-input"
+            ></ion-input>
+          </div>
+        </div>
+
+        <!-- SAM Status -->
+        <div>
+          <label class="text-gray-400 text-xs font-medium block mb-1">Registration Status</label>
+          <div class="bg-surface-input rounded-xl">
+            <ion-select
+              [(ngModel)]="profile.samRegistrationStatus"
+              interface="popover"
+              placeholder="Select status"
+              class="govcon-select"
+            >
+              <ion-select-option *ngFor="let opt of samStatusOptions" [value]="opt.value">
+                {{ opt.label }}
+              </ion-select-option>
+            </ion-select>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- NAICS Codes -->
+    <div>
+      <h2 class="text-white font-bold text-lg m-0 mb-2">NAICS Codes</h2>
+      <p class="text-gray-500 text-xs m-0 mb-3">Select the codes that apply to your business</p>
+      <div class="space-y-2">
+        <div *ngFor="let n of naicsCodes"
+             class="bg-surface-card rounded-xl p-3 border flex items-center gap-3 active:bg-dark-200"
+             [class]="isNaicsSelected(n.code) ? 'border-primary-500' : 'border-dark-300'"
+             (click)="toggleNaics(n.code)">
+          <div class="w-5 h-5 rounded border flex items-center justify-center shrink-0"
+               [class]="isNaicsSelected(n.code) ? 'bg-primary-500 border-primary-500' : 'border-gray-600'">
+            <ion-icon *ngIf="isNaicsSelected(n.code)" name="checkmark-circle-outline" class="text-white text-xs"></ion-icon>
+          </div>
+          <div>
+            <p class="text-white text-sm font-medium m-0">{{ n.code }}</p>
+            <p class="text-gray-400 text-xs m-0">{{ n.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Set-Aside Eligibility -->
+    <div>
+      <h2 class="text-white font-bold text-lg m-0 mb-2">Set-Aside Eligibility</h2>
+      <p class="text-gray-500 text-xs m-0 mb-3">Select your qualifying certifications</p>
+      <div class="flex flex-wrap gap-2">
+        <button
+          *ngFor="let sa of setAsideOptions"
+          (click)="toggleSetAside(sa)"
+          class="px-4 py-2 rounded-xl text-sm font-medium transition-all"
+          [class]="isSetAsideSelected(sa)
+            ? 'bg-primary-500 text-white'
+            : 'bg-dark-200 text-gray-400 border border-dark-300'"
+        >
+          {{ sa }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Past Performance -->
+    <div>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-white font-bold text-lg m-0">Past Performance</h2>
+        <ion-button fill="clear" size="small" (click)="addPastPerformance()" class="text-primary-400">
+          <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+          Add
+        </ion-button>
+      </div>
+
+      <div *ngFor="let pp of profile.pastPerformance; let i = index"
+           class="bg-surface-card rounded-xl p-4 border border-dark-300 mb-3 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-gray-400 text-xs font-medium">Performance #{{ i + 1 }}</span>
+          <button (click)="removePastPerformance(i)" class="text-red-400">
+            <ion-icon name="trash-outline" class="text-sm"></ion-icon>
+          </button>
+        </div>
+
+        <div>
+          <label class="text-gray-500 text-xs block mb-1">Agency</label>
+          <div class="bg-surface-input rounded-xl">
+            <ion-input [(ngModel)]="pp.agency" placeholder="Contracting agency" class="govcon-input"></ion-input>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-gray-500 text-xs block mb-1">Contract Number</label>
+          <div class="bg-surface-input rounded-xl">
+            <ion-input [(ngModel)]="pp.contractNumber" placeholder="e.g. W91QUZ-24-C-0088" class="govcon-input"></ion-input>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-gray-500 text-xs block mb-1">Value ($)</label>
+          <div class="bg-surface-input rounded-xl">
+            <ion-input [(ngModel)]="pp.value" type="number" placeholder="Contract value" class="govcon-input"></ion-input>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-gray-500 text-xs block mb-1">Description</label>
+          <div class="bg-surface-input rounded-xl">
+            <ion-textarea [(ngModel)]="pp.description" placeholder="Describe the work performed" rows="3" class="govcon-input"></ion-textarea>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="profile.pastPerformance.length === 0"
+           class="bg-surface-card rounded-xl p-6 border border-dashed border-dark-300 text-center">
+        <p class="text-gray-500 text-sm m-0">No past performance entries</p>
+        <p class="text-gray-600 text-xs m-0 mt-1">Add your government contract history</p>
+      </div>
+    </div>
+
+    <!-- Capability Summary -->
+    <div>
+      <h2 class="text-white font-bold text-lg m-0 mb-2">Capability Summary</h2>
+      <div class="bg-surface-input rounded-xl">
+        <ion-textarea
+          [(ngModel)]="profile.capabilitySummary"
+          placeholder="Describe your company's capabilities, experience, and differentiators for government work..."
+          rows="5"
+          class="govcon-input"
+        ></ion-textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Fixed save button -->
+  <div *ngIf="!isLoading"
+       class="fixed bottom-0 left-0 right-0 bg-dark-DEFAULT border-t border-dark-300 p-4 z-50">
+    <ion-button
+      expand="block"
+      fill="solid"
+      (click)="saveProfile()"
+      [disabled]="isSaving"
+      style="--border-radius: 12px; --background: #0066FF;"
+    >
+      <ion-icon name="save-outline" slot="start"></ion-icon>
+      {{ isSaving ? 'Saving...' : 'Save Profile' }}
+    </ion-button>
+  </div>
+</ion-content>

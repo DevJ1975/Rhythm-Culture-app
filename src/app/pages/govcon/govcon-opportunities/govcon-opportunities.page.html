@@ -1,0 +1,120 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/govcon" text="" icon="chevron-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Opportunities</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      [debounce]="400"
+      placeholder="Search opportunities..."
+      (ionInput)="onSearch($event)"
+      [value]="searchKeyword"
+      class="custom-searchbar"
+    ></ion-searchbar>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+
+  <!-- Filter Chips -->
+  <div class="px-4 pt-3 pb-2">
+    <!-- Set-aside filters -->
+    <div class="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+      <button
+        *ngFor="let sa of setAsideOptions"
+        (click)="selectSetAside(sa)"
+        class="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all"
+        [class]="selectedSetAside === sa ? 'bg-primary-500 text-white' : 'bg-dark-200 text-gray-400'"
+      >
+        {{ sa }}
+      </button>
+    </div>
+    <!-- NAICS filters -->
+    <div class="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+      <button
+        *ngFor="let n of naicsCodes"
+        (click)="selectNaics(n.code)"
+        class="shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all"
+        [class]="selectedNaics === n.code ? 'bg-primary-500 text-white' : 'bg-dark-200 text-gray-400'"
+      >
+        {{ n.description }}
+      </button>
+    </div>
+    <!-- Clear filters -->
+    <div *ngIf="hasFilters()" class="flex justify-end">
+      <button (click)="clearFilters()" class="text-xs text-primary-400 flex items-center gap-1">
+        <ion-icon name="close-circle-outline"></ion-icon>
+        Clear filters
+      </button>
+    </div>
+  </div>
+
+  <!-- Skeleton loading -->
+  <div *ngIf="isLoading" class="px-4 pt-2 space-y-3">
+    <div *ngFor="let i of [1,2,3,4,5]" class="bg-surface-card rounded-xl p-4 border border-dark-300">
+      <ion-skeleton-text animated style="width: 85%; height: 16px;" class="rounded mb-2"></ion-skeleton-text>
+      <ion-skeleton-text animated style="width: 50%; height: 14px;" class="rounded mb-3"></ion-skeleton-text>
+      <div class="flex gap-3">
+        <ion-skeleton-text animated style="width: 80px; height: 12px;" class="rounded"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 60px; height: 12px;" class="rounded"></ion-skeleton-text>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div *ngIf="!isLoading" class="px-4 pt-2 pb-24 space-y-3">
+    <p class="text-gray-500 text-xs m-0 mb-1">{{ opportunities.length }} opportunities found</p>
+
+    <div *ngFor="let opp of opportunities"
+         class="bg-surface-card rounded-xl p-4 border border-dark-300 active:bg-dark-200"
+         [routerLink]="['/govcon/opportunities', opp.id]">
+
+      <!-- Header -->
+      <div class="flex items-start justify-between mb-2">
+        <span class="text-xs px-2 py-0.5 rounded-full" [class]="getSetAsideColor(opp.setAside)">
+          {{ opp.setAside }}
+        </span>
+        <span class="text-xs text-gray-500">{{ opp.type }}</span>
+      </div>
+
+      <!-- Title -->
+      <p class="text-white text-sm font-medium m-0 mb-1 leading-snug">{{ opp.title }}</p>
+
+      <!-- Agency -->
+      <p class="text-gray-400 text-xs m-0 mb-3">{{ opp.agency }}<span *ngIf="opp.office"> — {{ opp.office }}</span></p>
+
+      <!-- Meta row -->
+      <div class="flex items-center gap-4 text-xs">
+        <span class="flex items-center gap-1" [class]="getDeadlineColor(opp.responseDeadline)">
+          <ion-icon name="time-outline"></ion-icon>
+          {{ getDaysUntil(opp.responseDeadline) }} days left
+        </span>
+        <span class="text-gray-500 flex items-center gap-1" *ngIf="opp.estimatedValue">
+          <ion-icon name="cash-outline"></ion-icon>
+          {{ formatCurrency(opp.estimatedValue) }}
+        </span>
+        <span class="text-gray-500 flex items-center gap-1" *ngIf="opp.placeOfPerformance?.state">
+          <ion-icon name="location-outline"></ion-icon>
+          {{ opp.placeOfPerformance?.state }}
+        </span>
+      </div>
+
+      <!-- NAICS tags -->
+      <div class="flex flex-wrap gap-1 mt-2">
+        <span *ngFor="let code of opp.naicsCodes"
+              class="text-xs px-2 py-0.5 rounded bg-dark-200 text-gray-400">
+          {{ code }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="opportunities.length === 0" class="flex flex-col items-center py-16">
+      <ion-icon name="search-outline" class="text-gray-700 text-5xl mb-4"></ion-icon>
+      <p class="text-gray-500 text-sm">No opportunities found</p>
+      <p class="text-gray-600 text-xs">Try adjusting your filters</p>
+    </div>
+  </div>
+</ion-content>

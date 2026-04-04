@@ -13,4 +13,9 @@ export const environment = {
   },
   useEmulators: false,
   appVersion: '1.0.0',
+  samGov: {
+    apiKey: 'YOUR_SAM_GOV_API_KEY',
+    baseUrl: 'https://api.sam.gov',
+    useMockData: false,
+  },
 };

@@ -12,7 +12,7 @@ import { addIcons } from 'ionicons';
 import {
   settingsOutline, createOutline, shareOutline,
   gridOutline, filmOutline, personAddOutline, checkmarkOutline,
-  ellipsisVertical, chevronBackOutline,
+  ellipsisVertical, chevronBackOutline, briefcaseOutline,
 } from 'ionicons/icons';
 import { UserProfile, Post } from '../../models';
 import { AuthService } from '../../core/services/auth.service';
@@ -54,6 +54,7 @@ export class ProfilePage implements OnInit {
     addIcons({
       settingsOutline, createOutline, shareOutline, gridOutline, filmOutline,
       personAddOutline, checkmarkOutline, ellipsisVertical, chevronBackOutline,
+      briefcaseOutline,
     });
   }
 
