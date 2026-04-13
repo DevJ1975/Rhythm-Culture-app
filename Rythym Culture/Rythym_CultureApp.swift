@@ -1,32 +1,16 @@
-//
-//  Rythym_CultureApp.swift
-//  Rythym Culture
-//
-//  Created by Jamil Jones on 4/10/26.
-//
+// Rythym_CultureApp.swift
+// App entry point. AuthViewModel is injected into the environment for global access.
 
 import SwiftUI
-import SwiftData
 
 @main
 struct Rythym_CultureApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    @State private var authViewModel = AuthViewModel()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
+                .environment(authViewModel)
         }
-        .modelContainer(sharedModelContainer)
     }
 }
