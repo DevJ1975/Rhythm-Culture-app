@@ -136,7 +136,7 @@ struct NotificationRow: View {
         // Bold the actor username
         let parts = notif.message.split(separator: " ", maxSplits: 1)
         guard parts.count == 2 else { return Text(notif.message) }
-        return Text(parts[0]).fontWeight(.semibold) + Text(" ") + Text(parts[1])
+        return Text("\(Text(String(parts[0])).fontWeight(.semibold)) \(String(parts[1]))")
     }
 
     private var typeIcon: String {

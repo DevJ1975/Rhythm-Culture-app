@@ -5,16 +5,22 @@ import SwiftUI
 
 struct StoriesRowView: View {
     let stories: [StoryItem]
+    @State private var selectedStory: StoryItem?
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 14) {
                 ForEach(stories) { story in
                     StoryBubbleView(story: story)
+                        .onTapGesture { selectedStory = story }
                 }
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 10)
+        }
+        .fullScreenCover(item: $selectedStory) { story in
+            let startIndex = stories.firstIndex(where: { $0.id == story.id }) ?? 0
+            StoryViewerView(stories: stories, startIndex: startIndex)
         }
     }
 }
@@ -23,10 +29,7 @@ struct StoryBubbleView: View {
     let story: StoryItem
 
     var body: some View {
-        Button {
-            // Phase 3: open story viewer
-        } label: {
-            VStack(spacing: 6) {
+        VStack(spacing: 6) {
                 ZStack {
                     // Gradient ring for unseen stories
                     if story.hasUnseenStory {
@@ -88,8 +91,6 @@ struct StoryBubbleView: View {
                     .foregroundStyle(.primary)
                     .lineLimit(1)
                     .frame(width: 70)
-            }
         }
-        .buttonStyle(.plain)
     }
 }

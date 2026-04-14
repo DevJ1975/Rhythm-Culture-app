@@ -180,6 +180,7 @@ struct GiftPickerView: View {
 
 // MARK: - Go Live Setup
 struct GoLiveView: View {
+    let user: AppUser
     @Environment(\.dismiss) private var dismiss
     @State private var title = ""
     @State private var isLive = false
@@ -250,10 +251,10 @@ struct GoLiveView: View {
             .fullScreenCover(isPresented: $isLive) {
                 LiveStreamView(stream: LiveStream(
                     id: UUID().uuidString,
-                    hostId: MockData.currentUser.id,
-                    hostUsername: MockData.currentUser.username,
-                    hostDisplayName: MockData.currentUser.displayName,
-                    hostImageURL: MockData.currentUser.profileImageURL ?? "",
+                    hostId: user.id,
+                    hostUsername: user.username,
+                    hostDisplayName: user.displayName,
+                    hostImageURL: user.profileImageURL ?? MockData.avatarURL(user.id),
                     title: title,
                     viewerCount: 0,
                     isActive: true,

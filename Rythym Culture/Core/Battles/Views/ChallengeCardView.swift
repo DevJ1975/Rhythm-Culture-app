@@ -6,6 +6,10 @@ import SwiftUI
 struct ChallengeCardView: View {
     let challenge: Challenge
     @State private var votedSide: VoteSide? = nil
+    @State private var hasAccepted = false
+    @State private var hasSubmitted = false
+    @State private var showSubmitSheet = false
+    @State private var showAcceptConfirm = false
 
     enum VoteSide { case a, b }
 
@@ -105,23 +109,49 @@ struct ChallengeCardView: View {
 
     private var openChallengerColumn: some View {
         VStack(spacing: 8) {
-            Circle()
-                .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [4]))
-                .foregroundStyle(Color(.systemGray3))
-                .frame(width: 52, height: 52)
-                .overlay(Image(systemName: "plus").foregroundStyle(.secondary))
+            if hasAccepted {
+                RemoteImage(url: MockData.avatarURL(MockData.currentUser.id))
+                    .frame(width: 52, height: 52)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.green, lineWidth: 2))
+            } else {
+                Circle()
+                    .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [4]))
+                    .foregroundStyle(Color(.systemGray3))
+                    .frame(width: 52, height: 52)
+                    .overlay(Image(systemName: "plus").foregroundStyle(.secondary))
+            }
 
-            Text("Open Spot").font(.caption.bold()).foregroundStyle(.secondary)
-            Text("Be first!").font(.caption2).foregroundStyle(.secondary)
+            Text(hasAccepted ? "@\(MockData.currentUser.username)" : "Open Spot")
+                .font(.caption.bold())
+                .foregroundStyle(hasAccepted ? .primary : .secondary)
+                .lineLimit(1)
+            Text(hasAccepted ? "You accepted!" : "Be first!")
+                .font(.caption2)
+                .foregroundStyle(hasAccepted ? .green : .secondary)
 
-            Button { } label: {
-                Text("Accept").font(.caption.bold())
+            Button {
+                if !hasAccepted { showAcceptConfirm = true }
+            } label: {
+                Text(hasAccepted ? "Accepted ✓" : "Accept")
+                    .font(.caption.bold())
                     .padding(.horizontal, 14).padding(.vertical, 6)
-                    .background(LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing))
+                    .background(hasAccepted
+                        ? AnyShapeStyle(Color.green)
+                        : AnyShapeStyle(LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing)))
                     .foregroundStyle(.white).clipShape(Capsule())
             }
+            .disabled(hasAccepted)
         }
         .frame(maxWidth: .infinity)
+        .confirmationDialog("Accept this battle?", isPresented: $showAcceptConfirm, titleVisibility: .visible) {
+            Button("Accept Challenge") {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) { hasAccepted = true }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("You'll be listed as the challenger in \"\(challenge.title)\"")
+        }
     }
 
     // MARK: – Vote Bar
@@ -153,11 +183,21 @@ struct ChallengeCardView: View {
             Label("\(challenge.submissionCount) submissions", systemImage: "play.circle")
                 .font(.caption).foregroundStyle(.secondary)
             Spacer()
-            Button { } label: {
-                Text("Submit Entry").font(.caption.bold())
+            Button { if !hasSubmitted { showSubmitSheet = true } } label: {
+                Text(hasSubmitted ? "Submitted ✓" : "Submit Entry")
+                    .font(.caption.bold())
                     .padding(.horizontal, 14).padding(.vertical, 7)
-                    .background(LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing))
+                    .background(hasSubmitted
+                        ? AnyShapeStyle(Color.green)
+                        : AnyShapeStyle(LinearGradient(colors: gradientColors, startPoint: .leading, endPoint: .trailing)))
                     .foregroundStyle(.white).clipShape(Capsule())
+            }
+            .disabled(hasSubmitted)
+            .sheet(isPresented: $showSubmitSheet) {
+                SubmitEntryView(challenge: challenge) {
+                    withAnimation { hasSubmitted = true }
+                }
+                .presentationDetents([.medium])
             }
         }
     }
@@ -168,5 +208,73 @@ struct ChallengeCardView: View {
         let days = seconds / 86400
         let hours = (seconds % 86400) / 3600
         return days > 0 ? "\(days)d left" : "\(hours)h left"
+    }
+}
+
+// MARK: - Submit Entry View
+struct SubmitEntryView: View {
+    let challenge: Challenge
+    var onSubmit: () -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var note = ""
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 20) {
+                // Challenge info pill
+                HStack(spacing: 8) {
+                    Text(challenge.artistType.emoji).font(.title3)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(challenge.title).font(.subheadline.bold()).lineLimit(1)
+                        Text(challenge.artistType.rawValue + " Battle")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(14)
+                .background(Color(.systemGray6))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                // Upload placeholder
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color(.systemGray6))
+                    .frame(height: 140)
+                    .overlay(
+                        VStack(spacing: 10) {
+                            Image(systemName: "video.badge.plus")
+                                .font(.system(size: 36)).foregroundStyle(.secondary)
+                            Text("Tap to upload your entry")
+                                .font(.subheadline).foregroundStyle(.secondary)
+                        }
+                    )
+
+                // Optional note
+                TextField("Add a note about your entry (optional)...", text: $note, axis: .vertical)
+                    .font(.subheadline)
+                    .lineLimit(2...4)
+                    .padding(12)
+                    .background(Color(.systemGray6))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                Spacer()
+            }
+            .padding(20)
+            .navigationTitle("Submit Entry")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Submit") {
+                        onSubmit()
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color(challenge.artistType.gradient.first ?? .purple))
+                }
+            }
+        }
     }
 }

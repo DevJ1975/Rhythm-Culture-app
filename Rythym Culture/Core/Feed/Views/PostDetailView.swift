@@ -9,6 +9,9 @@ struct PostDetailView: View {
     @State private var commentText = ""
     @State private var isLiked: Bool
     @State private var likesCount: Int
+    @State private var isBookmarked = false
+    @State private var showPostMenu = false
+    @State private var showReportAlert = false
     @FocusState private var inputFocused: Bool
 
     init(post: Post) {
@@ -42,12 +45,18 @@ struct PostDetailView: View {
                     Button { inputFocused = true } label: {
                         Image(systemName: "bubble.right").font(.title2).foregroundStyle(.primary)
                     }
-                    Button {} label: {
+                    ShareLink(item: URL(string: "https://rhythmculture.app/p/\(post.id)")!,
+                              subject: Text(post.authorUsername),
+                              message: Text(post.caption)) {
                         Image(systemName: "paperplane").font(.title2).foregroundStyle(.primary)
                     }
                     Spacer()
-                    Button {} label: {
-                        Image(systemName: "bookmark").font(.title2).foregroundStyle(.primary)
+                    Button {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) { isBookmarked.toggle() }
+                    } label: {
+                        Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
+                            .font(.title2).foregroundStyle(.primary)
+                            .symbolEffect(.bounce, value: isBookmarked)
                     }
                 }
                 .padding(.horizontal, 14).padding(.top, 12)
@@ -55,7 +64,7 @@ struct PostDetailView: View {
                 // Likes + caption
                 VStack(alignment: .leading, spacing: 5) {
                     Text("\(likesCount.shortFormatted()) likes").font(.subheadline.bold())
-                    (Text(post.authorUsername).fontWeight(.semibold) + Text(" ") + Text(post.caption))
+                    Text("\(Text(post.authorUsername).fontWeight(.semibold)) \(post.caption)")
                         .font(.subheadline)
                     Text(post.createdAt.timeAgoDisplay()).font(.caption).foregroundStyle(.secondary)
                 }
@@ -112,11 +121,24 @@ struct PostDetailView: View {
                 }
             }
             Spacer()
-            Button {} label: {
+            Button { showPostMenu = true } label: {
                 Image(systemName: "ellipsis").foregroundStyle(.primary).padding(8)
             }
         }
         .padding(.horizontal, 12).padding(.vertical, 10)
+        .confirmationDialog("Post Options", isPresented: $showPostMenu) {
+            Button("Copy Link") {
+                UIPasteboard.general.string = "https://rhythmculture.app/p/\(post.id)"
+            }
+            Button("Not Interested") {}
+            Button("Report", role: .destructive) { showReportAlert = true }
+            Button("Cancel", role: .cancel) {}
+        }
+        .alert("Thanks for your report", isPresented: $showReportAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("We'll review this post and take appropriate action.")
+        }
     }
 
     // MARK: - Comment Input Bar
@@ -192,7 +214,7 @@ struct CommentRow: View {
             .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 4) {
-                (Text(comment.authorUsername).fontWeight(.semibold) + Text(" ") + Text(comment.text))
+                Text("\(Text(comment.authorUsername).fontWeight(.semibold)) \(comment.text)")
                     .font(.subheadline)
                 HStack(spacing: 12) {
                     Text(comment.createdAt.timeAgoDisplay())

@@ -2,6 +2,7 @@
 // Instagram-style post card with artist badges, post-type banners, and vibe reactions.
 
 import SwiftUI
+import AVKit
 
 struct PostCellView: View {
     let post: Post
@@ -13,6 +14,10 @@ struct PostCellView: View {
     @State private var myVibe: VibeType? = nil
     @State private var showVibeBar = false
     @State private var vibeReactions: Post.VibeReactions
+    @State private var isVideoPlaying = false
+    @State private var player: AVPlayer?
+    @State private var showPostMenu = false
+    @State private var showReportAlert = false
 
     enum VibeType: String, CaseIterable {
         case fire    = "🔥"
@@ -98,7 +103,6 @@ struct PostCellView: View {
     // MARK: – Header
     private var postHeader: some View {
         HStack(spacing: 10) {
-            // Avatar
             Circle()
                 .frame(width: 36, height: 36)
                 .overlay(
@@ -122,22 +126,39 @@ struct PostCellView: View {
                 }
             }
             Spacer()
-            Button { } label: {
+            Button { showPostMenu = true } label: {
                 Image(systemName: "ellipsis").foregroundStyle(.primary).padding(8)
             }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
+        .confirmationDialog("Post Options", isPresented: $showPostMenu) {
+            Button("Copy Link") {
+                UIPasteboard.general.string = "https://rhythmculture.app/p/\(post.id)"
+            }
+            Button("Not Interested") { /* handled via onNotInterested callback if needed */ }
+            Button("Report", role: .destructive) { showReportAlert = true }
+            Button("Cancel", role: .cancel) {}
+        }
+        .alert("Thanks for your report", isPresented: $showReportAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("We'll review this post and take appropriate action.")
+        }
     }
 
     // MARK: – Media
     private var postMedia: some View {
         ZStack {
             if let urlString = post.mediaURLs.first {
-                RemoteImage(url: urlString)
-                    .frame(maxWidth: .infinity)
-                    .aspectRatio(1, contentMode: .fit)
-                    .clipped()
+                if post.mediaType == .video {
+                    videoMediaView(urlString: urlString)
+                } else {
+                    RemoteImage(url: urlString)
+                        .frame(maxWidth: .infinity)
+                        .aspectRatio(1, contentMode: .fit)
+                        .clipped()
+                }
             } else {
                 Rectangle()
                     .fill(LinearGradient(colors: avatarGradient.map { $0.opacity(0.35) },
@@ -157,6 +178,41 @@ struct PostCellView: View {
         .onTapGesture(count: 2) { handleDoubleTapLike() }
     }
 
+    @ViewBuilder
+    private func videoMediaView(urlString: String) -> some View {
+        if isVideoPlaying, let player {
+            VideoPlayer(player: player)
+                .frame(maxWidth: .infinity)
+                .aspectRatio(9/16, contentMode: .fit)
+                .onDisappear {
+                    player.pause()
+                    isVideoPlaying = false
+                }
+        } else {
+            ZStack {
+                RemoteImage(url: urlString)
+                    .frame(maxWidth: .infinity)
+                    .aspectRatio(9/16, contentMode: .fit)
+                    .clipped()
+                Circle()
+                    .fill(.black.opacity(0.45))
+                    .frame(width: 60, height: 60)
+                    .overlay(
+                        Image(systemName: "play.fill")
+                            .font(.title2)
+                            .foregroundStyle(.white)
+                            .offset(x: 2)
+                    )
+            }
+            .onTapGesture {
+                if player == nil, let url = URL(string: urlString) {
+                    player = AVPlayer(url: url)
+                }
+                isVideoPlaying = true
+            }
+        }
+    }
+
     // MARK: – Action Bar
     private var actionBar: some View {
         HStack(spacing: 16) {
@@ -166,10 +222,13 @@ struct PostCellView: View {
                     .foregroundStyle(isLiked ? .red : .primary)
                     .symbolEffect(.bounce, value: isLiked)
             }
-            Button { } label: {
+            // Comment → deep-link handled via NavigationLink in FeedView; ShareLink provides the tap
+            NavigationLink(destination: PostDetailView(post: post)) {
                 Image(systemName: "bubble.right").font(.title2).foregroundStyle(.primary)
             }
-            Button { } label: {
+            ShareLink(item: URL(string: "https://rhythmculture.app/p/\(post.id)")!,
+                      subject: Text(post.authorUsername),
+                      message: Text(post.caption)) {
                 Image(systemName: "paperplane").font(.title2).foregroundStyle(.primary)
             }
             Button {
@@ -186,6 +245,7 @@ struct PostCellView: View {
             } label: {
                 Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                     .font(.title2).foregroundStyle(.primary)
+                    .symbolEffect(.bounce, value: isBookmarked)
             }
         }
         .padding(.horizontal, 14)
@@ -244,8 +304,9 @@ struct PostCellView: View {
     private var postMeta: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text("\(likesCount.shortFormatted()) likes").font(.subheadline.bold())
-            (Text(post.authorUsername).fontWeight(.semibold) + Text(" ") + Text(post.caption))
-                .font(.subheadline).lineLimit(3)
+            Text("\(Text(post.authorUsername).fontWeight(.semibold)) \(post.caption)")
+                .font(.subheadline)
+                .lineLimit(3)
             if post.commentsCount > 0 {
                 Button { } label: {
                     Text("View all \(post.commentsCount) comments").font(.subheadline).foregroundStyle(.secondary)

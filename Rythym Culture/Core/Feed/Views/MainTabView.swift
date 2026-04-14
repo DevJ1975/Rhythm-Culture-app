@@ -4,6 +4,7 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @Environment(AuthViewModel.self) var authViewModel
     @State private var selectedTab: Tab = .home
 
     enum Tab {
@@ -40,7 +41,7 @@ struct MainTabView: View {
                 }
                 .tag(Tab.connect)
 
-            ProfileView()
+            ProfileView(user: authViewModel.currentUser ?? MockData.currentUser)
                 .tabItem {
                     Image(systemName: selectedTab == .profile ? "person.crop.circle.fill" : "person.crop.circle")
                     Text("Profile")

@@ -9,6 +9,10 @@ struct LoginView: View {
     @State private var password = ""
     @State private var showSignUp = false
 
+    private var canLogin: Bool {
+        !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && password.count >= 6
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
@@ -34,18 +38,20 @@ struct LoginView: View {
 
                 // Input fields
                 VStack(spacing: 12) {
-                    TextField("Email or username", text: $email)
+                    TextField("Email", text: $email)
                         .padding()
                         .background(Color(.systemGray6))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .keyboardType(.emailAddress)
+                        .textContentType(.emailAddress)
 
                     SecureField("Password", text: $password)
                         .padding()
                         .background(Color(.systemGray6))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .textContentType(.password)
                 }
                 .padding(.horizontal, 24)
 
@@ -59,26 +65,43 @@ struct LoginView: View {
                 .padding(.horizontal, 24)
                 .padding(.top, 10)
 
-                // Log in button — bypasses auth until Firebase is connected
+                // Error message
+                if let error = authViewModel.errorMessage {
+                    Text(error)
+                        .font(.footnote)
+                        .foregroundStyle(.red)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                        .padding(.top, 12)
+                }
+
+                // Log in button
                 Button {
-                    authViewModel.isAuthenticated = true
+                    Task { await authViewModel.signIn(email: email, password: password) }
                 } label: {
-                    Text("Log in")
-                        .fontWeight(.semibold)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(
-                            LinearGradient(
-                                colors: [.purple, .pink, .orange],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
+                    Group {
+                        if authViewModel.isLoading {
+                            ProgressView().tint(.white)
+                        } else {
+                            Text("Log in").fontWeight(.semibold)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(
+                        LinearGradient(
+                            colors: [.purple, .pink, .orange],
+                            startPoint: .leading,
+                            endPoint: .trailing
                         )
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .opacity(canLogin ? 1 : 0.5)
+                    )
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 20)
+                .disabled(!canLogin || authViewModel.isLoading)
 
                 // OR divider
                 HStack(spacing: 12) {

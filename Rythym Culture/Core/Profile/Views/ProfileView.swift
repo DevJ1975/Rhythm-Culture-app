@@ -11,11 +11,19 @@ struct ProfileView: View {
     @State private var showSettings = false
 
     @AppStorage("isDarkMode") private var isDarkMode = false
+    @Environment(AuthViewModel.self) private var authViewModel
+    @State private var showEditProfile = false
 
     private let columns = [GridItem(.flexible(), spacing: 2), GridItem(.flexible(), spacing: 2), GridItem(.flexible(), spacing: 2)]
 
     init(user: AppUser = MockData.currentUser) {
         self.user = user
+    }
+
+    // Use live authViewModel data when this is the current user's own profile
+    private var displayUser: AppUser {
+        guard let live = authViewModel.currentUser, live.id == user.id else { return user }
+        return live
     }
 
     var body: some View {
@@ -28,7 +36,7 @@ struct ProfileView: View {
                     postGrid
                 }
             }
-            .navigationTitle(user.username)
+            .navigationTitle(displayUser.username)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -37,10 +45,18 @@ struct ProfileView: View {
                     }
                 }
             }
-            .sheet(isPresented: $showGoLive) { GoLiveView() }
+            .sheet(isPresented: $showEditProfile) {
+                EditProfileView(user: authViewModel.currentUser ?? user)
+            }
+            .sheet(isPresented: $showGoLive) {
+                GoLiveView(user: authViewModel.currentUser ?? user)
+            }
             .sheet(item: $showLiveStream) { LiveStreamView(stream: $0) }
             .sheet(isPresented: $showSettings) {
-                SettingsSheet(isDarkMode: $isDarkMode)
+                SettingsSheet(isDarkMode: $isDarkMode) {
+                    showSettings = false
+                    Task { await authViewModel.signOut() }
+                }
             }
         }
         .preferredColorScheme(isDarkMode ? .dark : .light)
@@ -53,7 +69,7 @@ struct ProfileView: View {
                 // Avatar with optional LIVE badge
                 ZStack(alignment: .bottomTrailing) {
                     avatarView
-                    if MockData.liveStreams.contains(where: { $0.hostId == user.id && $0.isActive }) {
+                    if MockData.liveStreams.contains(where: { $0.hostId == displayUser.id && $0.isActive }) {
                         Text("LIVE")
                             .font(.system(size: 9, weight: .black))
                             .foregroundStyle(.white)
@@ -66,21 +82,21 @@ struct ProfileView: View {
 
                 // Stats
                 HStack(spacing: 0) {
-                    statColumn(value: user.postsCount, label: "Posts")
-                    statColumn(value: user.followersCount, label: "Followers")
-                    statColumn(value: user.followingCount, label: "Following")
+                    statColumn(value: displayUser.postsCount, label: "Posts")
+                    statColumn(value: displayUser.followersCount, label: "Followers")
+                    statColumn(value: displayUser.followingCount, label: "Following")
                 }
             }
 
             // Name, Artist Badge & Seller Tier
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(user.displayName).font(.subheadline.bold())
+                    Text(displayUser.displayName).font(.subheadline.bold())
                     HStack(spacing: 6) {
-                        if let type = user.artistType {
+                        if let type = displayUser.artistType {
                             ArtistBadgeView(artistType: type)
                         }
-                        if let tier = MockData.sellerTier(forUserId: user.id) {
+                        if let tier = MockData.sellerTier(forUserId: displayUser.id) {
                             SellerTierBadgeView(tier: tier)
                         }
                     }
@@ -89,21 +105,21 @@ struct ProfileView: View {
             }
 
             // Bio
-            if let bio = user.bio {
+            if let bio = displayUser.bio {
                 Text(bio).font(.subheadline)
             }
 
             // Location & genres
-            if let location = user.location {
+            if let location = displayUser.location {
                 HStack(spacing: 4) {
                     Image(systemName: "mappin.circle").font(.caption).foregroundStyle(.secondary)
                     Text(location).font(.caption).foregroundStyle(.secondary)
                 }
             }
-            if !user.genres.isEmpty {
+            if !displayUser.genres.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
-                        ForEach(user.genres, id: \.self) { genre in
+                        ForEach(displayUser.genres, id: \.self) { genre in
                             Text(genre)
                                 .font(.caption)
                                 .padding(.horizontal, 10).padding(.vertical, 4)
@@ -116,7 +132,7 @@ struct ProfileView: View {
 
             // Action buttons
             HStack(spacing: 8) {
-                Button {} label: {
+                Button { showEditProfile = true } label: {
                     Text("Edit Profile")
                         .font(.subheadline.bold())
                         .frame(maxWidth: .infinity).padding(.vertical, 7)
@@ -147,7 +163,7 @@ struct ProfileView: View {
             }
 
             // Active live stream prompt
-            if let live = MockData.liveStreams.first(where: { $0.hostId == user.id && $0.isActive }) {
+            if let live = MockData.liveStreams.first(where: { $0.hostId == displayUser.id && $0.isActive }) {
                 Button { showLiveStream = live } label: {
                     HStack {
                         Circle().fill(.red).frame(width: 8, height: 8)
@@ -171,17 +187,17 @@ struct ProfileView: View {
 
     private var avatarView: some View {
         Group {
-            if let url = user.profileImageURL {
+            if let url = displayUser.profileImageURL {
                 RemoteImage(url: url)
                     .frame(width: 86, height: 86)
                     .clipShape(Circle())
-                    .overlay(Circle().stroke(user.artistType?.color ?? .gray, lineWidth: 2.5))
+                    .overlay(Circle().stroke(displayUser.artistType?.color ?? .gray, lineWidth: 2.5))
             } else {
                 Circle()
-                    .fill(LinearGradient(colors: user.artistType?.gradient ?? [.gray, .gray], startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .fill(LinearGradient(colors: displayUser.artistType?.gradient ?? [.gray, .gray], startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(width: 86, height: 86)
                     .overlay(
-                        Text(user.username.prefix(1).uppercased())
+                        Text(displayUser.username.prefix(1).uppercased())
                             .font(.title.bold()).foregroundStyle(.white)
                     )
             }
@@ -220,9 +236,10 @@ struct ProfileView: View {
 
     // MARK: - Post Grid
     private var postGrid: some View {
-        LazyVGrid(columns: columns, spacing: 2) {
-            ForEach(0..<min(user.postsCount, 30), id: \.self) { i in
-                RemoteImage(url: MockData.gridImageURL(index: i))
+        let urls = (0..<min(displayUser.postsCount, 30)).map { MockData.gridImageURL(index: $0) }
+        return LazyVGrid(columns: columns, spacing: 2) {
+            ForEach(urls, id: \.self) { url in
+                RemoteImage(url: url)
                     .aspectRatio(1, contentMode: .fill)
                     .clipped()
             }
@@ -233,7 +250,9 @@ struct ProfileView: View {
 // MARK: - Settings Sheet
 struct SettingsSheet: View {
     @Binding var isDarkMode: Bool
+    var onSignOut: () -> Void
     @Environment(\.dismiss) private var dismiss
+    @State private var showSignOutConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -271,6 +290,22 @@ struct SettingsSheet: View {
                             .foregroundStyle(.secondary)
                     }
                 }
+
+                Section {
+                    Button(role: .destructive) {
+                        showSignOutConfirmation = true
+                    } label: {
+                        HStack {
+                            Image(systemName: "rectangle.portrait.and.arrow.right")
+                                .frame(width: 28)
+                            Text("Sign Out")
+                        }
+                    }
+                }
+            }
+            .confirmationDialog("Sign out of Rhythm Culture?", isPresented: $showSignOutConfirmation, titleVisibility: .visible) {
+                Button("Sign Out", role: .destructive) { onSignOut() }
+                Button("Cancel", role: .cancel) {}
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)

@@ -1,5 +1,5 @@
 // AppUser.swift
-// Core user model. Maps to Firestore `users` collection.
+// Core user model. Maps to Supabase `profiles` table.
 
 import Foundation
 
@@ -17,6 +17,18 @@ struct AppUser: Identifiable, Codable, Hashable {
     var followingCount: Int
     var postsCount: Int
     let createdAt: Date
+
+    // Maps Swift camelCase properties to Supabase snake_case columns
+    enum CodingKeys: String, CodingKey {
+        case id, username, email, bio, genres, location
+        case displayName    = "display_name"
+        case profileImageURL = "profile_image_url"
+        case artistType     = "artist_type"
+        case followersCount = "followers_count"
+        case followingCount = "following_count"
+        case postsCount     = "posts_count"
+        case createdAt      = "created_at"
+    }
 
     init(
         id: String,
