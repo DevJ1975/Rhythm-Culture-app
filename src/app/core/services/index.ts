@@ -9,3 +9,5 @@ export * from './event.service';
 export * from './course.service';
 export * from './admin.service';
 export * from './payment.service';
+export * from './search.service';
+export * from './recommendation.service';

@@ -1,0 +1,108 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/discover"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Search</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-searchbar
+      [value]="query"
+      (ionInput)="onInput($event)"
+      placeholder="Search artists, posts, #tags..."
+      debounce="0">
+    </ion-searchbar>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="tab">
+      <ion-segment-button value="all"><ion-label>All</ion-label></ion-segment-button>
+      <ion-segment-button value="users"><ion-label>Artists</ion-label></ion-segment-button>
+      <ion-segment-button value="posts"><ion-label>Posts</ion-label></ion-segment-button>
+      <ion-segment-button value="events"><ion-label>Events</ion-label></ion-segment-button>
+      <ion-segment-button value="courses"><ion-label>Courses</ion-label></ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="flex justify-center py-8" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <ng-container *ngIf="!loading">
+    <!-- Users -->
+    <ion-list *ngIf="(tab === 'all' || tab === 'users') && results.users.length">
+      <ion-item lines="none" class="font-semibold text-xs uppercase text-gray-500" *ngIf="tab === 'all'">
+        Artists
+      </ion-item>
+      <ion-item *ngFor="let user of results.users" [routerLink]="['/profile', user.uid]">
+        <ion-avatar slot="start">
+          <img [src]="user.photoURL || '/assets/icon/favicon.png'" />
+        </ion-avatar>
+        <ion-label>
+          <h3>{{ user.artistName || user.displayName }}</h3>
+          <p *ngIf="user.specialties?.length">{{ user.specialties.join(', ') }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Posts -->
+    <ion-list *ngIf="(tab === 'all' || tab === 'posts') && results.posts.length">
+      <ion-item lines="none" class="font-semibold text-xs uppercase text-gray-500" *ngIf="tab === 'all'">
+        Posts
+      </ion-item>
+      <ion-item *ngFor="let post of results.posts" [routerLink]="['/post', post.id]">
+        <ion-label>
+          <h3>{{ post.caption || '(no caption)' }}</h3>
+          <p *ngIf="post.tags?.length">{{ post.tags.join(' · ') }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Events -->
+    <ion-list *ngIf="(tab === 'all' || tab === 'events') && results.events.length">
+      <ion-item lines="none" class="font-semibold text-xs uppercase text-gray-500" *ngIf="tab === 'all'">
+        Events
+      </ion-item>
+      <ion-item *ngFor="let event of results.events" [routerLink]="['/events', event.id]">
+        <ion-label>
+          <h3>{{ event.title }}</h3>
+          <p>{{ event.category }} · {{ event.format }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Courses -->
+    <ion-list *ngIf="(tab === 'all' || tab === 'courses') && results.courses.length">
+      <ion-item lines="none" class="font-semibold text-xs uppercase text-gray-500" *ngIf="tab === 'all'">
+        Courses
+      </ion-item>
+      <ion-item *ngFor="let course of results.courses" [routerLink]="['/masterclass', course.id]">
+        <ion-label>
+          <h3>{{ course.title }}</h3>
+          <p>{{ course.level }} · {{ course.category }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Collaborations -->
+    <ion-list *ngIf="(tab === 'all' || tab === 'collaborations') && results.collaborations.length">
+      <ion-item lines="none" class="font-semibold text-xs uppercase text-gray-500" *ngIf="tab === 'all'">
+        Collaborations
+      </ion-item>
+      <ion-item *ngFor="let c of results.collaborations" [routerLink]="['/collaboration', c.id]">
+        <ion-label>
+          <h3>{{ c.title }}</h3>
+          <p>{{ c.type }} · {{ c.isRemote ? 'Remote' : 'In person' }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Empty state -->
+    <div *ngIf="query && !loading && !results.users.length && !results.posts.length && !results.events.length && !results.courses.length && !results.collaborations.length"
+         class="text-center text-gray-500 py-12">
+      <ion-icon name="search-outline" class="text-4xl mb-2"></ion-icon>
+      <p>No results for "{{ query }}"</p>
+    </div>
+  </ng-container>
+</ion-content>

@@ -81,6 +81,18 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/admin/admin.page').then((m) => m.AdminPage),
   },
+  {
+    path: 'search',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/search/search.page').then((m) => m.SearchPage),
+  },
+  {
+    path: 'hashtag/:tag',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/hashtag/hashtag.page').then((m) => m.HashtagPage),
+  },
   // ── Main App (authenticated, tab layout) ─────────────────────────────────
   {
     path: 'tabs',

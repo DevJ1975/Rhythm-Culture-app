@@ -35,5 +35,8 @@ export * from './posts/on-post-deleted';
 export * from './scheduled/cleanup';
 export * from './admin/verification';
 export * from './payments/stripe';
+export * from './notifications/on-mention';
+export * from './search/indexing';
+export * from './scheduled/trending';
 
 export { db, messaging };

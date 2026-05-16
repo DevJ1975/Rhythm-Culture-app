@@ -197,4 +197,32 @@ export class PostService {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     return `${origin}/post/${postId}`;
   }
+
+  // ─── Trending ────────────────────────────────────────────────────────────────
+
+  async getTrendingPosts(pageLimit = 20): Promise<Post[]> {
+    const trendingRef = doc(this.firestore, 'meta/trending');
+    const snap = await getDoc(trendingRef);
+    if (!snap.exists()) return [];
+    const data = snap.data() as { posts?: { id: string }[] };
+    const ids = (data.posts || []).slice(0, pageLimit).map((p) => p.id);
+    if (ids.length === 0) return [];
+
+    // Fetch posts in parallel; ignore any that no longer exist.
+    const fetched = await Promise.all(
+      ids.map(async (id) => {
+        const s = await getDoc(doc(this.firestore, `posts/${id}`));
+        return s.exists() ? ({ ...s.data(), id: s.id } as Post) : null;
+      })
+    );
+    return fetched.filter((p): p is Post => p !== null);
+  }
+
+  async getTrendingHashtags(): Promise<{ tag: string; count: number }[]> {
+    const ref = doc(this.firestore, 'meta/trending_tags');
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return [];
+    const data = snap.data() as { tags?: { tag: string; count: number }[] };
+    return data.tags || [];
+  }
 }
