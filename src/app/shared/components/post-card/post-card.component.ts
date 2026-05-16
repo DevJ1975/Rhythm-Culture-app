@@ -83,9 +83,19 @@ export class PostCardComponent implements OnInit {
     this.commentClicked.emit(this.post);
   }
 
-  onShare(): void {
+  async onShare(): Promise<void> {
     this.shareClicked.emit(this.post);
+    try {
+      const result = await this.postService.sharePost(this.post);
+      this.post.sharesCount = (this.post.sharesCount || 0) + 1;
+      this.lastShareResult = result;
+      setTimeout(() => (this.lastShareResult = null), 2500);
+    } catch {
+      // swallow — sharing is best-effort
+    }
   }
+
+  lastShareResult: 'shared' | 'copied' | null = null;
 
   onOptions(event: Event): void {
     event.stopPropagation();

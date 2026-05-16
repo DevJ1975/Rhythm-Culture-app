@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { noAuthGuard } from './core/guards/no-auth.guard';
+import { verifiedGuard } from './core/guards/verified.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -39,10 +41,19 @@ export const routes: Routes = [
       },
     ],
   },
+  // ── Verify Email (signed in but unverified) ───────────────────────────────
+  {
+    path: 'auth/verify-email',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/auth/verify-email/verify-email.page').then(
+        (m) => m.VerifyEmailPage
+      ),
+  },
   // ── Main App (authenticated, tab layout) ─────────────────────────────────
   {
     path: 'tabs',
-    canActivate: [authGuard],
+    canActivate: [authGuard, verifiedGuard],
     loadComponent: () =>
       import('./pages/tabs/tabs.page').then((m) => m.TabsPage),
     children: [

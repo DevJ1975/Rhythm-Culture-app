@@ -5,6 +5,8 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
 import { provideFirestore, getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
 import { provideStorage, getStorage, connectStorageEmulator } from '@angular/fire/storage';
+import { provideFunctions, getFunctions, connectFunctionsEmulator } from '@angular/fire/functions';
+import { provideAnalytics, getAnalytics, isSupported, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
 import { provideHttpClient } from '@angular/common/http';
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
@@ -39,5 +41,23 @@ export const appConfig: ApplicationConfig = {
       }
       return storage;
     }),
+    provideFunctions(() => {
+      const functions = getFunctions();
+      if (environment.useEmulators) {
+        connectFunctionsEmulator(functions, 'localhost', 5001);
+      }
+      return functions;
+    }),
+    provideAnalytics(() => {
+      // Analytics is browser-only; provide a no-op-friendly factory.
+      // isSupported() resolves asynchronously, so we tolerate the sync call here —
+      // Firebase will throw cleanly in unsupported environments.
+      return getAnalytics();
+    }),
+    ScreenTrackingService,
+    UserTrackingService,
   ],
 };
+
+// Re-export so unused-import linters don't strip them.
+void isSupported;

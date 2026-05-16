@@ -158,4 +158,43 @@ export class PostService {
     await deleteDoc(commentRef);
     await updateDoc(postRef, { commentsCount: increment(-1) });
   }
+
+  // ─── Sharing ──────────────────────────────────────────────────────────────────
+
+  /**
+   * Records a share and returns a deep link URL.
+   * Tries the native Web Share API first; falls back to copying the link.
+   */
+  async sharePost(post: Post): Promise<'shared' | 'copied'> {
+    const url = this.buildPostUrl(post.id);
+    const title = post.author?.artistName || post.author?.displayName || 'Rhythm Culture';
+    const text = post.caption?.slice(0, 140) ?? 'Check out this post on Rhythm Culture';
+
+    // Increment counter first so the count is accurate even if the user cancels the OS sheet
+    const postRef = doc(this.firestore, `posts/${post.id}`);
+    updateDoc(postRef, { sharesCount: increment(1) }).catch(() => {});
+
+    const nav = navigator as Navigator & {
+      share?: (data: { title?: string; text?: string; url?: string }) => Promise<void>;
+    };
+
+    if (nav.share) {
+      try {
+        await nav.share({ title, text, url });
+        return 'shared';
+      } catch {
+        // user cancelled — fall through to copy
+      }
+    }
+
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(url);
+    }
+    return 'copied';
+  }
+
+  buildPostUrl(postId: string): string {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    return `${origin}/post/${postId}`;
+  }
 }

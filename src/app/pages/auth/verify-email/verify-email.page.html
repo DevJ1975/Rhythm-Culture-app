@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Verify your email</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="flex flex-col items-center text-center max-w-md mx-auto pt-12">
+    <ion-icon name="mail-open-outline" class="text-6xl text-primary mb-4"></ion-icon>
+    <h2 class="text-xl font-semibold mb-2">Check your inbox</h2>
+    <p class="text-gray-500 mb-1">We sent a verification link to</p>
+    <p class="font-medium mb-6">{{ email }}</p>
+
+    <p class="text-sm text-gray-500 mb-6">
+      Click the link in that email, then come back and tap "I've verified".
+    </p>
+
+    <ion-button expand="block" (click)="checkVerified()" [disabled]="checking" class="w-full mb-3">
+      <ion-icon name="refresh-outline" slot="start"></ion-icon>
+      {{ checking ? 'Checking...' : "I've verified" }}
+    </ion-button>
+
+    <ion-button expand="block" fill="outline" (click)="resend()" [disabled]="resending" class="w-full mb-3">
+      Resend email
+    </ion-button>
+
+    <ion-button expand="block" fill="clear" (click)="signOut()" class="w-full">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Sign out
+    </ion-button>
+
+    <ion-text *ngIf="status === 'resent'" color="success" class="mt-4 text-sm">
+      Verification email sent.
+    </ion-text>
+    <ion-text *ngIf="status === 'still-unverified'" color="warning" class="mt-4 text-sm">
+      Still not verified. Check your inbox (and spam folder).
+    </ion-text>
+    <ion-text *ngIf="status === 'error'" color="danger" class="mt-4 text-sm">
+      Couldn't send. Try again in a moment.
+    </ion-text>
+  </div>
+</ion-content>

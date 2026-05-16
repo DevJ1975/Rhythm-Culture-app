@@ -28,8 +28,11 @@ export * from './notifications/on-post-liked';
 export * from './notifications/on-post-commented';
 export * from './notifications/on-user-followed';
 export * from './notifications/on-message-sent';
+export * from './notifications/on-course-enrolled';
 export * from './users/on-user-created';
+export * from './users/on-user-deleted';
 export * from './posts/on-post-deleted';
 export * from './scheduled/cleanup';
+export * from './admin/verification';
 
 export { db, messaging };
