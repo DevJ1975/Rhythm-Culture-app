@@ -32,10 +32,15 @@ async function mirrorToSearch(
 ): Promise<void> {
   const cfg = functions.config().search || {};
   if (!cfg.provider) return;
+  // Dynamic require so this module compiles without algolia/typesense installed.
+  // To enable: `npm install algoliasearch` or `npm install typesense` in functions/.
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const req: NodeRequire = eval('require');
   try {
     if (cfg.provider === 'algolia' && cfg.algolia_app_id && cfg.algolia_admin_key) {
-      const algoliasearch = (await import('algoliasearch')).default;
-      const client = algoliasearch(cfg.algolia_app_id, cfg.algolia_admin_key);
+      const algoliasearch = req('algoliasearch');
+      const factory = algoliasearch.default || algoliasearch;
+      const client = factory(cfg.algolia_app_id, cfg.algolia_admin_key);
       const idx = client.initIndex(index);
       if (data) {
         await idx.saveObject({ objectID: id, ...data });
@@ -47,9 +52,9 @@ async function mirrorToSearch(
       cfg.typesense_host &&
       cfg.typesense_api_key
     ) {
-      // Lazy import; users can install typesense if they choose this provider.
-      const Typesense = (await import('typesense')).default;
-      const client = new Typesense.Client({
+      const Typesense = req('typesense');
+      const Ctor = Typesense.default?.Client || Typesense.Client;
+      const client = new Ctor({
         nodes: [{ host: cfg.typesense_host, port: 443, protocol: 'https' }],
         apiKey: cfg.typesense_api_key,
         connectionTimeoutSeconds: 5,
