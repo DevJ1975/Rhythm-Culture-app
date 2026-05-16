@@ -1,4 +1,4 @@
-import { ApplicationConfig } from '@angular/core';
+import { ApplicationConfig, ErrorHandler } from '@angular/core';
 import { provideRouter, RouteReuseStrategy, withPreloading, PreloadAllModules } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
 import { provideFirebaseApp, initializeApp, getApp } from '@angular/fire/app';
@@ -17,6 +17,7 @@ import { provideAnalytics, getAnalytics, isSupported, ScreenTrackingService, Use
 import { provideHttpClient } from '@angular/common/http';
 import { routes } from './app.routes';
 import { environment } from '../environments/environment';
+import { ErrorTrackingService } from './core/services/error-tracking.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -75,6 +76,8 @@ export const appConfig: ApplicationConfig = {
     }),
     ScreenTrackingService,
     UserTrackingService,
+
+    { provide: ErrorHandler, useClass: ErrorTrackingService },
   ],
 };
 

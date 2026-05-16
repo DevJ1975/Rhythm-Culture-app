@@ -39,5 +39,7 @@ export * from './notifications/on-mention';
 export * from './search/indexing';
 export * from './scheduled/trending';
 export * from './live/streaming';
+export * from './moderation/reports';
+export * from './scheduled/event-reminders';
 
 export { db, messaging };

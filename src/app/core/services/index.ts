@@ -16,3 +16,6 @@ export * from './story.service';
 export * from './i18n.service';
 export * from './network.service';
 export * from './camera.service';
+export * from './analytics.service';
+export * from './report.service';
+export * from './error-tracking.service';

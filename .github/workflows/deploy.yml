@@ -1,0 +1,46 @@
+name: Deploy to Firebase
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy hosting + functions + rules
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install app deps
+        run: npm ci --no-audit --no-fund
+
+      - name: Install functions deps
+        working-directory: functions
+        run: npm ci --no-audit --no-fund
+
+      - name: Build app
+        run: npm run build:prod
+
+      - name: Build functions
+        working-directory: functions
+        run: npm run build
+
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Deploy
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          firebase deploy \
+            --only hosting,functions,firestore:rules,storage:rules \
+            --token "$FIREBASE_TOKEN" \
+            --non-interactive
