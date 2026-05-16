@@ -11,13 +11,15 @@ import {
 import { Post } from '../../../models';
 import { AuthService } from '../../../core/services/auth.service';
 import { PostService } from '../../../core/services/post.service';
+import { AudioPlayerComponent } from '../audio-player/audio-player.component';
+import { AutoplayOnVisibleDirective } from '../../directives/autoplay-on-visible.directive';
 
 @Component({
   selector: 'app-post-card',
   templateUrl: './post-card.component.html',
   styleUrls: ['./post-card.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, IonIcon],
+  imports: [CommonModule, RouterModule, IonIcon, AudioPlayerComponent, AutoplayOnVisibleDirective],
 })
 export class PostCardComponent implements OnInit {
   @Input() post!: Post;

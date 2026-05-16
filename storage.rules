@@ -68,5 +68,22 @@ service firebase.storage {
       allow write: if isAuthenticated() && isOwner(organizerId) && (isImage() && isMediumFile());
       allow delete: if isAuthenticated() && isOwner(organizerId);
     }
+
+    // Stories (24h ephemeral)
+    match /stories/{userId}/{storyId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && isOwner(userId) && (
+        (isImage() && isMediumFile()) ||
+        (isVideo() && isMediumFile())
+      );
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+
+    // Reports — write-once attachments
+    match /reports/{userId}/{reportId}/{fileName} {
+      allow read: if isAuthenticated() && isOwner(userId);
+      allow write: if isAuthenticated() && isOwner(userId) && isSmallFile();
+      allow delete: if false;
+    }
   }
 }

@@ -38,21 +38,20 @@
 
     <!-- Video -->
     <ng-container *ngIf="post.type === 'video'">
-      <div class="relative w-full overflow-hidden" style="max-height: 420px;">
-        <img
-          [src]="post.media[0].thumbnailUrl || post.media[0].url"
+      <div class="relative w-full overflow-hidden bg-black" style="max-height: 480px;">
+        <video
+          autoplayOnVisible
+          [src]="post.media[0].url"
+          [poster]="post.media[0].thumbnailUrl"
+          muted
+          loop
+          playsinline
+          controls
           class="w-full object-cover"
-          style="max-height: 420px;"
-          [alt]="post.caption"
-          loading="lazy"
-        />
-        <div class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20">
-          <div class="w-14 h-14 rounded-full bg-black bg-opacity-50 flex items-center justify-center">
-            <ion-icon name="play" class="text-white ml-1" style="font-size: 26px;"></ion-icon>
-          </div>
-        </div>
+          style="max-height: 480px;">
+        </video>
         <span *ngIf="post.media[0].duration"
-          class="absolute bottom-2.5 right-3 text-white text-xs font-medium bg-black bg-opacity-60 px-2 py-0.5 rounded-full">
+          class="absolute bottom-2.5 right-3 text-white text-xs font-medium bg-black bg-opacity-60 px-2 py-0.5 rounded-full pointer-events-none">
           {{ formatDuration(post.media[0].duration) }}
         </span>
       </div>
@@ -73,20 +72,8 @@
 
     <!-- Audio -->
     <ng-container *ngIf="post.type === 'audio'">
-      <div class="mx-3 my-1 rounded-2xl bg-dark-100 border border-dark-200 px-4 py-4 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-xl bg-primary-500 bg-opacity-15 flex items-center justify-center flex-shrink-0">
-          <ion-icon name="musical-note-outline" class="text-primary-400" style="font-size: 22px;"></ion-icon>
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex gap-0.5 items-end h-7 mb-1.5">
-            <div *ngFor="let b of audioBars" class="w-1 rounded-full bg-primary-500 opacity-70"
-                 [style.height]="b + 'px'"></div>
-          </div>
-          <p class="text-gray-500 text-xs m-0">{{ formatDuration(post.media[0].duration) || 'Audio track' }}</p>
-        </div>
-        <button class="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center flex-shrink-0">
-          <ion-icon name="play" class="text-white ml-0.5" style="font-size: 18px;"></ion-icon>
-        </button>
+      <div class="mx-3 my-1">
+        <app-audio-player [src]="post.media[0].url" [waveform]="audioBars"></app-audio-player>
       </div>
     </ng-container>
 

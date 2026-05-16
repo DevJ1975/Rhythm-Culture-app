@@ -11,3 +11,5 @@ export * from './admin.service';
 export * from './payment.service';
 export * from './search.service';
 export * from './recommendation.service';
+export * from './live-stream.service';
+export * from './story.service';

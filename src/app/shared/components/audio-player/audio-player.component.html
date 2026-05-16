@@ -1,0 +1,30 @@
+<div class="audio-player flex items-center gap-3 p-3 bg-gray-900 rounded-lg">
+  <button class="play-btn flex-shrink-0 w-10 h-10 rounded-full bg-primary flex items-center justify-center" (click)="toggle()">
+    <ion-icon [name]="playing ? 'pause-outline' : 'play-outline'" class="text-white text-xl"></ion-icon>
+  </button>
+
+  <div class="flex-1 min-w-0">
+    <div class="flex items-end h-8 gap-px">
+      <div
+        *ngFor="let h of waveform; let i = index"
+        class="waveform-bar flex-1 transition-colors cursor-pointer"
+        [style.height.px]="h"
+        [class.bg-primary]="(i / waveform.length) <= progress"
+        [class.bg-gray-600]="(i / waveform.length) > progress"
+        (click)="seekTo(i)">
+      </div>
+    </div>
+    <div class="flex justify-between text-xs text-gray-400 mt-1">
+      <span>{{ fmt(current) }}</span>
+      <span>{{ fmt(duration) }}</span>
+    </div>
+  </div>
+
+  <audio
+    #audio
+    [src]="src"
+    preload="metadata"
+    (loadedmetadata)="onLoaded()"
+    (timeupdate)="onTimeUpdate()"
+    (ended)="onEnded()"></audio>
+</div>

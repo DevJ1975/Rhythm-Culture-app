@@ -38,5 +38,6 @@ export * from './payments/stripe';
 export * from './notifications/on-mention';
 export * from './search/indexing';
 export * from './scheduled/trending';
+export * from './live/streaming';
 
 export { db, messaging };
