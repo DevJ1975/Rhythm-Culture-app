@@ -50,6 +50,37 @@ export const routes: Routes = [
         (m) => m.VerifyEmailPage
       ),
   },
+  // ── Payment & Upgrade ─────────────────────────────────────────────────────
+  {
+    path: 'upgrade',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/upgrade/upgrade.page').then((m) => m.UpgradePage),
+  },
+  {
+    path: 'payment-success',
+    canActivate: [authGuard],
+    data: { outcome: 'success' },
+    loadComponent: () =>
+      import('./pages/payment-result/payment-result.page').then(
+        (m) => m.PaymentResultPage
+      ),
+  },
+  {
+    path: 'payment-cancel',
+    canActivate: [authGuard],
+    data: { outcome: 'cancel' },
+    loadComponent: () =>
+      import('./pages/payment-result/payment-result.page').then(
+        (m) => m.PaymentResultPage
+      ),
+  },
+  {
+    path: 'admin',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () =>
+      import('./pages/admin/admin.page').then((m) => m.AdminPage),
+  },
   // ── Main App (authenticated, tab layout) ─────────────────────────────────
   {
     path: 'tabs',

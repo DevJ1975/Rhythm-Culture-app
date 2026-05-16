@@ -34,5 +34,6 @@ export * from './users/on-user-deleted';
 export * from './posts/on-post-deleted';
 export * from './scheduled/cleanup';
 export * from './admin/verification';
+export * from './payments/stripe';
 
 export { db, messaging };

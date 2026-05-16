@@ -8,3 +8,4 @@ export * from './collaboration.service';
 export * from './event.service';
 export * from './course.service';
 export * from './admin.service';
+export * from './payment.service';

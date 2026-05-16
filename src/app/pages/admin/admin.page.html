@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Admin</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-segment [(ngModel)]="tab" class="mb-4">
+    <ion-segment-button value="verify">
+      <ion-label>Verification</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="admins">
+      <ion-label>Admins</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">User ID</ion-label>
+      <ion-input [(ngModel)]="uid" placeholder="firebase auth uid"></ion-input>
+    </ion-item>
+  </ion-list>
+
+  <div class="flex gap-2 mt-4" *ngIf="tab === 'verify'">
+    <ion-button (click)="verify(true)" [disabled]="busy || !uid" expand="block" class="flex-1">Mark verified</ion-button>
+    <ion-button (click)="verify(false)" fill="outline" [disabled]="busy || !uid" expand="block" class="flex-1">Remove badge</ion-button>
+  </div>
+
+  <div class="flex gap-2 mt-4" *ngIf="tab === 'admins'">
+    <ion-button (click)="grant()" [disabled]="busy || !uid" expand="block" class="flex-1">Grant admin</ion-button>
+    <ion-button (click)="revoke()" fill="outline" color="danger" [disabled]="busy || !uid" expand="block" class="flex-1">Revoke admin</ion-button>
+  </div>
+
+  <ion-note *ngIf="message" class="block mt-4 text-center">{{ message }}</ion-note>
+</ion-content>
