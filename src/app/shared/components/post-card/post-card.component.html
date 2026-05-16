@@ -96,9 +96,12 @@
       <button
         (click)="toggleLike()"
         [disabled]="isLoading"
+        [attr.aria-pressed]="isLiked"
+        [attr.aria-label]="isLiked ? 'Unlike post' : 'Like post'"
         class="flex items-center gap-1.5 py-1 pr-3 active:scale-95 transition-transform"
       >
         <ion-icon
+          aria-hidden="true"
           [name]="isLiked ? 'heart' : 'heart-outline'"
           [class]="isLiked ? 'text-red-500' : 'text-gray-300'"
           style="font-size: 24px;"
@@ -108,22 +111,28 @@
       <!-- Comment -->
       <button
         (click)="onComment()"
+        aria-label="View comments"
         class="flex items-center gap-1.5 py-1 pr-3 text-gray-300 active:scale-95 transition-transform"
       >
-        <ion-icon name="chatbubble-outline" style="font-size: 22px;"></ion-icon>
+        <ion-icon aria-hidden="true" name="chatbubble-outline" style="font-size: 22px;"></ion-icon>
       </button>
 
       <!-- Share -->
       <button
         (click)="onShare()"
+        aria-label="Share post"
         class="flex items-center gap-1.5 py-1 text-gray-300 active:scale-95 transition-transform"
       >
-        <ion-icon name="paper-plane-outline" style="font-size: 22px;"></ion-icon>
+        <ion-icon aria-hidden="true" name="paper-plane-outline" style="font-size: 22px;"></ion-icon>
       </button>
 
+      <span *ngIf="lastShareResult" role="status" class="sr-only">
+        {{ lastShareResult === 'shared' ? 'Shared' : 'Link copied' }}
+      </span>
+
       <!-- Bookmark pushed right -->
-      <button class="ml-auto text-gray-300 py-1 active:scale-95 transition-transform">
-        <ion-icon name="bookmark-outline" style="font-size: 22px;"></ion-icon>
+      <button aria-label="Save post" class="ml-auto text-gray-300 py-1 active:scale-95 transition-transform">
+        <ion-icon aria-hidden="true" name="bookmark-outline" style="font-size: 22px;"></ion-icon>
       </button>
     </div>
 

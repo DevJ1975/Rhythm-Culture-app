@@ -93,6 +93,22 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/hashtag/hashtag.page').then((m) => m.HashtagPage),
   },
+  {
+    path: 'settings/notifications',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/settings/notification-prefs/notification-prefs.page').then(
+        (m) => m.NotificationPrefsPage
+      ),
+  },
+  {
+    path: 'settings/language',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/settings/language/language.page').then(
+        (m) => m.LanguagePage
+      ),
+  },
   // ── Main App (authenticated, tab layout) ─────────────────────────────────
   {
     path: 'tabs',

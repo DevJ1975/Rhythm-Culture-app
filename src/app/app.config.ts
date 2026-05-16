@@ -1,9 +1,16 @@
 import { ApplicationConfig } from '@angular/core';
 import { provideRouter, RouteReuseStrategy, withPreloading, PreloadAllModules } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
-import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
+import { provideFirebaseApp, initializeApp, getApp } from '@angular/fire/app';
 import { provideAuth, getAuth, connectAuthEmulator } from '@angular/fire/auth';
-import { provideFirestore, getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
+import {
+  provideFirestore,
+  getFirestore,
+  connectFirestoreEmulator,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+} from '@angular/fire/firestore';
 import { provideStorage, getStorage, connectStorageEmulator } from '@angular/fire/storage';
 import { provideFunctions, getFunctions, connectFunctionsEmulator } from '@angular/fire/functions';
 import { provideAnalytics, getAnalytics, isSupported, ScreenTrackingService, UserTrackingService } from '@angular/fire/analytics';
@@ -28,7 +35,19 @@ export const appConfig: ApplicationConfig = {
       return auth;
     }),
     provideFirestore(() => {
-      const firestore = getFirestore();
+      // Enable IndexedDB persistence so reads and queued writes work offline.
+      // Multi-tab manager lets multiple browser tabs share the same cache safely.
+      let firestore;
+      try {
+        firestore = initializeFirestore(getApp(), {
+          localCache: persistentLocalCache({
+            tabManager: persistentMultipleTabManager(),
+          }),
+        });
+      } catch {
+        // initializeFirestore throws if called more than once (e.g. HMR) — fall back.
+        firestore = getFirestore();
+      }
       if (environment.useEmulators) {
         connectFirestoreEmulator(firestore, 'localhost', 8080);
       }

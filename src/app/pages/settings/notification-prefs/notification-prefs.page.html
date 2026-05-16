@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Notifications</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="flex justify-center py-8" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+  </div>
+
+  <ion-list *ngIf="!loading">
+    <ion-item *ngFor="let item of items">
+      <ion-label>
+        <h3>{{ item.label }}</h3>
+        <p>{{ item.description }}</p>
+      </ion-label>
+      <ion-toggle
+        slot="end"
+        [checked]="prefs[item.key]"
+        (ionChange)="toggle(item.key, $event.detail.checked)">
+      </ion-toggle>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Language</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let locale of locales" button (click)="select(locale.code)">
+      <ion-label>{{ locale.name }}</ion-label>
+      <ion-icon
+        *ngIf="i18n.locale() === locale.code"
+        name="checkmark-outline"
+        slot="end"
+        color="primary">
+      </ion-icon>
+    </ion-item>
+  </ion-list>
+</ion-content>
