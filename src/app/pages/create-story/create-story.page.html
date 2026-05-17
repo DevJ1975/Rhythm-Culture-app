@@ -1,0 +1,73 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/feed"></ion-back-button>
+    </ion-buttons>
+    <ion-title>New Story</ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        (click)="publish()"
+        [disabled]="!selectedFile || isPosting"
+        color="primary"
+        fill="solid"
+        size="small">
+        <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+        Post
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <input
+    #fileInput
+    type="file"
+    accept="image/*,video/*"
+    class="hidden"
+    (change)="onFileSelected($event)"
+  />
+
+  <div *ngIf="!preview" class="flex flex-col items-center justify-center pt-12">
+    <p class="text-gray-500 mb-6 text-center">
+      Stories disappear after 24 hours.
+    </p>
+    <div class="flex gap-3">
+      <ion-button (click)="openCamera()" size="large">
+        <ion-icon name="camera-outline" slot="start"></ion-icon>
+        Camera
+      </ion-button>
+      <ion-button (click)="openGallery()" fill="outline" size="large">
+        <ion-icon name="image-outline" slot="start"></ion-icon>
+        Gallery
+      </ion-button>
+    </div>
+  </div>
+
+  <div *ngIf="preview" class="relative max-w-md mx-auto">
+    <button
+      (click)="removeMedia()"
+      aria-label="Remove media"
+      class="absolute top-2 right-2 z-10 w-9 h-9 rounded-full bg-black bg-opacity-60 flex items-center justify-center">
+      <ion-icon name="close-outline" class="text-white text-xl"></ion-icon>
+    </button>
+
+    <img *ngIf="selectedType === 'image'" [src]="preview" class="w-full rounded-xl object-cover" />
+    <video
+      *ngIf="selectedType === 'video'"
+      [src]="preview"
+      controls
+      class="w-full rounded-xl"></video>
+
+    <ion-input
+      [(ngModel)]="caption"
+      placeholder="Add a caption (optional)"
+      maxlength="120"
+      class="mt-4">
+    </ion-input>
+
+    <div *ngIf="isPosting" class="mt-4 flex items-center gap-2">
+      <ion-spinner></ion-spinner>
+      <span class="text-sm text-gray-500">Uploading {{ uploadProgress }}%...</span>
+    </div>
+  </div>
+</ion-content>

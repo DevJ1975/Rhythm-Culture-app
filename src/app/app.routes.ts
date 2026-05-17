@@ -82,6 +82,14 @@ export const routes: Routes = [
       import('./pages/admin/admin.page').then((m) => m.AdminPage),
   },
   {
+    path: 'admin/moderation',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () =>
+      import('./pages/admin/moderation-queue/moderation-queue.page').then(
+        (m) => m.ModerationQueuePage
+      ),
+  },
+  {
     path: 'search',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -233,6 +241,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/post-detail/post-detail.page').then(
         (m) => m.PostDetailPage
+      ),
+  },
+  {
+    path: 'create-story',
+    canActivate: [authGuard, verifiedGuard],
+    loadComponent: () =>
+      import('./pages/create-story/create-story.page').then(
+        (m) => m.CreateStoryPage
       ),
   },
   // ── Fallback ──────────────────────────────────────────────────────────────

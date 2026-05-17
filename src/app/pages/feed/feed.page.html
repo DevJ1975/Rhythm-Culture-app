@@ -13,6 +13,16 @@
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="mode" (ionChange)="onModeChange()" color="primary">
+      <ion-segment-button value="following">
+        <ion-label>Following</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="foryou">
+        <ion-label>For You</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content fullscreen>
