@@ -43,23 +43,4 @@ export const onUserCreated = functions.auth.user().onCreate(async (user) => {
   }
 });
 
-/**
- * Triggered when a Firebase Auth user is deleted.
- * Cleans up user data.
- */
-export const onUserDeleted = functions.auth.user().onDelete(async (user) => {
-  const { uid } = user;
-  try {
-    // Mark user as deleted (soft delete) instead of removing data immediately
-    await db.doc(`users/${uid}`).update({
-      isDeleted: true,
-      deletedAt: admin.firestore.FieldValue.serverTimestamp(),
-      email: 'deleted@rhythmculture.app',
-      displayName: 'Deleted User',
-      photoURL: null,
-    });
-    functions.logger.info(`Soft-deleted user: ${uid}`);
-  } catch (error) {
-    functions.logger.error('Error in onUserDeleted:', error);
-  }
-});
+// onUserDeleted is defined in ./on-user-deleted.ts

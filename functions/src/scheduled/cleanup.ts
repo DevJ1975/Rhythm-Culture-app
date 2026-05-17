@@ -83,3 +83,47 @@ export const updateTrendingPosts = functions.pubsub
       functions.logger.error('Error in updateTrendingPosts:', error);
     }
   });
+
+/**
+ * Scheduled function to delete expired stories (>24h old).
+ * Runs hourly.
+ */
+export const cleanupExpiredStories = functions.pubsub
+  .schedule('every 60 minutes')
+  .onRun(async () => {
+    const now = admin.firestore.Timestamp.now();
+    try {
+      const snap = await db
+        .collection('stories')
+        .where('expiresAt', '<', now)
+        .limit(500)
+        .get();
+      if (snap.empty) return;
+
+      const storage = admin.storage().bucket();
+      for (const docSnap of snap.docs) {
+        const story = docSnap.data();
+        // Delete viewer subcollection
+        const views = await docSnap.ref.collection('views').get();
+        const batch = db.batch();
+        views.docs.forEach((v) => batch.delete(v.ref));
+        batch.delete(docSnap.ref);
+        await batch.commit();
+
+        // Delete media from storage
+        if (story['storagePath']) {
+          try {
+            await storage.file(story['storagePath']).delete();
+          } catch (e) {
+            functions.logger.warn(
+              `Could not delete storage path ${story['storagePath']}:`,
+              e
+            );
+          }
+        }
+      }
+      functions.logger.info(`Cleaned up ${snap.size} expired stories`);
+    } catch (error) {
+      functions.logger.error('Error in cleanupExpiredStories:', error);
+    }
+  });

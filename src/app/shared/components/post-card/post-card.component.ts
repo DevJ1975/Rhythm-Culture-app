@@ -11,13 +11,15 @@ import {
 import { Post } from '../../../models';
 import { AuthService } from '../../../core/services/auth.service';
 import { PostService } from '../../../core/services/post.service';
+import { AudioPlayerComponent } from '../audio-player/audio-player.component';
+import { AutoplayOnVisibleDirective } from '../../directives/autoplay-on-visible.directive';
 
 @Component({
   selector: 'app-post-card',
   templateUrl: './post-card.component.html',
   styleUrls: ['./post-card.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, IonIcon],
+  imports: [CommonModule, RouterModule, IonIcon, AudioPlayerComponent, AutoplayOnVisibleDirective],
 })
 export class PostCardComponent implements OnInit {
   @Input() post!: Post;
@@ -83,9 +85,19 @@ export class PostCardComponent implements OnInit {
     this.commentClicked.emit(this.post);
   }
 
-  onShare(): void {
+  async onShare(): Promise<void> {
     this.shareClicked.emit(this.post);
+    try {
+      const result = await this.postService.sharePost(this.post);
+      this.post.sharesCount = (this.post.sharesCount || 0) + 1;
+      this.lastShareResult = result;
+      setTimeout(() => (this.lastShareResult = null), 2500);
+    } catch {
+      // swallow — sharing is best-effort
+    }
   }
+
+  lastShareResult: 'shared' | 'copied' | null = null;
 
   onOptions(event: Event): void {
     event.stopPropagation();

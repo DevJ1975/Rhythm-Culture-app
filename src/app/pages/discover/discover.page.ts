@@ -8,12 +8,14 @@ import {
   IonAvatar, IonButton, IonIcon, IonChip, IonSkeletonText,
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { searchOutline, filterOutline } from 'ionicons/icons';
-import { UserProfile, ArtistSpecialty } from '../../models';
+import { searchOutline, filterOutline, flameOutline } from 'ionicons/icons';
+import { UserProfile, ArtistSpecialty, Post } from '../../models';
 import { UserService } from '../../core/services/user.service';
 import { CollaborationService } from '../../core/services/collaboration.service';
+import { PostService } from '../../core/services/post.service';
 import { MockDataService } from '../../core/services/mock-data.service';
 import { Collaboration } from '../../models';
+import { PostCardComponent } from '../../shared/components/post-card/post-card.component';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -22,7 +24,7 @@ import { environment } from '../../../environments/environment';
   styleUrls: ['./discover.page.scss'],
   standalone: true,
   imports: [
-    CommonModule, RouterModule, FormsModule,
+    CommonModule, RouterModule, FormsModule, PostCardComponent,
     IonHeader, IonToolbar, IonTitle, IonContent, IonSearchbar,
     IonSegment, IonSegmentButton, IonLabel, IonList, IonItem,
     IonAvatar, IonButton, IonIcon, IonChip, IonSkeletonText,
@@ -31,13 +33,17 @@ import { environment } from '../../../environments/environment';
 export class DiscoverPage implements OnInit {
   private userService = inject(UserService);
   private collabService = inject(CollaborationService);
+  private postService = inject(PostService);
   private mockData = inject(MockDataService);
 
   activeSegment = 'artists';
   searchQuery = '';
   isLoading = false;
+  isLoadingTrending = false;
   artists: UserProfile[] = [];
   collaborations: Collaboration[] = [];
+  trendingPosts: Post[] = [];
+  trendingTags: { tag: string; count: number }[] = [];
 
   specialtyFilters: ArtistSpecialty[] = [
     'Dance', 'Music', 'Vocals', 'Choreography', 'DJ', 'Production', 'Rap',
@@ -45,12 +51,13 @@ export class DiscoverPage implements OnInit {
   selectedSpecialty: ArtistSpecialty | null = null;
 
   constructor() {
-    addIcons({ searchOutline, filterOutline });
+    addIcons({ searchOutline, filterOutline, flameOutline });
   }
 
   ngOnInit(): void {
     this.loadArtists();
     this.loadCollaborations();
+    this.loadTrending();
   }
 
   async loadArtists(): Promise<void> {
@@ -84,6 +91,31 @@ export class DiscoverPage implements OnInit {
       this.selectedSpecialty ? { skill: this.selectedSpecialty } : {}
     );
     this.collaborations = result.collabs;
+  }
+
+  async loadTrending(): Promise<void> {
+    if (!environment.production) {
+      this.trendingPosts = this.mockData.getFeedPosts().slice(0, 10);
+      this.trendingTags = [
+        { tag: 'breakdance', count: 1240 },
+        { tag: 'hiphop', count: 980 },
+        { tag: 'afrobeats', count: 612 },
+        { tag: 'kpop', count: 488 },
+        { tag: 'vocals', count: 372 },
+      ];
+      return;
+    }
+    this.isLoadingTrending = true;
+    try {
+      const [posts, tags] = await Promise.all([
+        this.postService.getTrendingPosts(20),
+        this.postService.getTrendingHashtags(),
+      ]);
+      this.trendingPosts = posts;
+      this.trendingTags = tags;
+    } finally {
+      this.isLoadingTrending = false;
+    }
   }
 
   async onSpecialtyFilter(specialty: ArtistSpecialty): Promise<void> {

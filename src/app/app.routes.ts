@@ -1,6 +1,8 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { noAuthGuard } from './core/guards/no-auth.guard';
+import { verifiedGuard } from './core/guards/verified.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -39,10 +41,86 @@ export const routes: Routes = [
       },
     ],
   },
+  // ── Verify Email (signed in but unverified) ───────────────────────────────
+  {
+    path: 'auth/verify-email',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/auth/verify-email/verify-email.page').then(
+        (m) => m.VerifyEmailPage
+      ),
+  },
+  // ── Payment & Upgrade ─────────────────────────────────────────────────────
+  {
+    path: 'upgrade',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/upgrade/upgrade.page').then((m) => m.UpgradePage),
+  },
+  {
+    path: 'payment-success',
+    canActivate: [authGuard],
+    data: { outcome: 'success' },
+    loadComponent: () =>
+      import('./pages/payment-result/payment-result.page').then(
+        (m) => m.PaymentResultPage
+      ),
+  },
+  {
+    path: 'payment-cancel',
+    canActivate: [authGuard],
+    data: { outcome: 'cancel' },
+    loadComponent: () =>
+      import('./pages/payment-result/payment-result.page').then(
+        (m) => m.PaymentResultPage
+      ),
+  },
+  {
+    path: 'admin',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () =>
+      import('./pages/admin/admin.page').then((m) => m.AdminPage),
+  },
+  {
+    path: 'admin/moderation',
+    canActivate: [authGuard, adminGuard],
+    loadComponent: () =>
+      import('./pages/admin/moderation-queue/moderation-queue.page').then(
+        (m) => m.ModerationQueuePage
+      ),
+  },
+  {
+    path: 'search',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/search/search.page').then((m) => m.SearchPage),
+  },
+  {
+    path: 'hashtag/:tag',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/hashtag/hashtag.page').then((m) => m.HashtagPage),
+  },
+  {
+    path: 'settings/notifications',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/settings/notification-prefs/notification-prefs.page').then(
+        (m) => m.NotificationPrefsPage
+      ),
+  },
+  {
+    path: 'settings/language',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/settings/language/language.page').then(
+        (m) => m.LanguagePage
+      ),
+  },
   // ── Main App (authenticated, tab layout) ─────────────────────────────────
   {
     path: 'tabs',
-    canActivate: [authGuard],
+    canActivate: [authGuard, verifiedGuard],
     loadComponent: () =>
       import('./pages/tabs/tabs.page').then((m) => m.TabsPage),
     children: [
@@ -163,6 +241,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/post-detail/post-detail.page').then(
         (m) => m.PostDetailPage
+      ),
+  },
+  {
+    path: 'create-story',
+    canActivate: [authGuard, verifiedGuard],
+    loadComponent: () =>
+      import('./pages/create-story/create-story.page').then(
+        (m) => m.CreateStoryPage
       ),
   },
   // ── Fallback ──────────────────────────────────────────────────────────────

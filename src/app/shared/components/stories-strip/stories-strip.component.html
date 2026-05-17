@@ -1,10 +1,10 @@
 <div class="stories-strip flex gap-4 px-4 py-3 overflow-x-auto">
 
   <!-- Own story / add story -->
-  <div class="story-item flex flex-col items-center gap-1.5 flex-shrink-0">
+  <a routerLink="/create-story" aria-label="Create a story" class="story-item flex flex-col items-center gap-1.5 flex-shrink-0 no-underline">
     <div class="story-ring own-ring relative">
       <img
-        [src]="stories[0]?.photoURL || 'assets/images/default-avatar.png'"
+        [src]="(stories[0] && stories[0].photoURL) || 'assets/images/default-avatar.png'"
         class="w-16 h-16 rounded-full object-cover"
         alt="Your story"
       />
@@ -13,7 +13,7 @@
       </div>
     </div>
     <span class="text-white text-xs truncate w-16 text-center">Your Story</span>
-  </div>
+  </a>
 
   <!-- Other stories -->
   <div

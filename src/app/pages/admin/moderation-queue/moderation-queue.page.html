@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Moderation Queue</ion-title>
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="status" (ionChange)="onStatusChange()">
+      <ion-segment-button value="open"><ion-label>Open</ion-label></ion-segment-button>
+      <ion-segment-button value="actioned"><ion-label>Actioned</ion-label></ion-segment-button>
+      <ion-segment-button value="dismissed"><ion-label>Dismissed</ion-label></ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-note *ngIf="message" color="primary" class="block text-center py-2">{{ message }}</ion-note>
+
+  <ng-container *ngIf="reports$ | async as reports; else loading">
+    <ion-list *ngIf="reports.length">
+      <ion-item *ngFor="let r of reports" lines="full">
+        <ion-label>
+          <h3>
+            <ion-badge [color]="badgeColor(r.status)">{{ r.status }}</ion-badge>
+            <span class="ml-2 capitalize">{{ r.reason.replace('_', ' ') }}</span>
+          </h3>
+          <p>
+            <strong class="capitalize">{{ r.targetType }}</strong>
+            <a *ngIf="targetLink(r) as link" [routerLink]="link" class="text-primary-400 ml-1">
+              {{ r.targetId.slice(0, 8) }}…
+            </a>
+            <span *ngIf="!targetLink(r)" class="ml-1">{{ r.targetId.slice(0, 8) }}…</span>
+          </p>
+          <p *ngIf="r.details" class="text-gray-500">{{ r.details }}</p>
+        </ion-label>
+
+        <div slot="end" class="flex gap-2" *ngIf="r.status === 'open'">
+          <ion-button
+            (click)="resolve(r, 'approve')"
+            color="danger"
+            [disabled]="busyId === r.id"
+            size="small">
+            Action
+          </ion-button>
+          <ion-button
+            (click)="resolve(r, 'dismiss')"
+            fill="outline"
+            [disabled]="busyId === r.id"
+            size="small">
+            Dismiss
+          </ion-button>
+        </div>
+      </ion-item>
+    </ion-list>
+
+    <div *ngIf="!reports.length" class="text-center text-gray-500 py-12">
+      No {{ status }} reports.
+    </div>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="flex justify-center py-8">
+      <ion-spinner></ion-spinner>
+    </div>
+  </ng-template>
+</ion-content>

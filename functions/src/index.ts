@@ -5,7 +5,6 @@
  * or use Application Default Credentials in production via Firebase Admin.
  */
 
-import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin
@@ -28,8 +27,18 @@ export * from './notifications/on-post-liked';
 export * from './notifications/on-post-commented';
 export * from './notifications/on-user-followed';
 export * from './notifications/on-message-sent';
+export * from './notifications/on-course-enrolled';
 export * from './users/on-user-created';
+export * from './users/on-user-deleted';
 export * from './posts/on-post-deleted';
 export * from './scheduled/cleanup';
+export * from './admin/verification';
+export * from './payments/stripe';
+export * from './notifications/on-mention';
+export * from './search/indexing';
+export * from './scheduled/trending';
+export * from './live/streaming';
+export * from './moderation/reports';
+export * from './scheduled/event-reminders';
 
 export { db, messaging };

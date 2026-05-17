@@ -5,3 +5,5 @@ export * from './event.model';
 export * from './course.model';
 export * from './collaboration.model';
 export * from './notification.model';
+export * from './story.model';
+export * from './report.model';

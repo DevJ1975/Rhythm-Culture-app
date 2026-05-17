@@ -129,4 +129,17 @@ export class NotificationService {
     const snap = await getDocs(q);
     return snap.size;
   }
+
+  /** Update per-type notification preferences on the user profile. */
+  async updatePreferences(userId: string, prefs: Record<string, boolean>): Promise<void> {
+    const userRef = doc(this.firestore, `users/${userId}`);
+    await updateDoc(userRef, { notificationPrefs: prefs });
+  }
+
+  /** Removes a single FCM token (used when permission is revoked locally). */
+  async removeFcmToken(userId: string, token: string): Promise<void> {
+    const { arrayRemove } = await import('@angular/fire/firestore');
+    const userRef = doc(this.firestore, `users/${userId}`);
+    await updateDoc(userRef, { fcmTokens: arrayRemove(token) });
+  }
 }

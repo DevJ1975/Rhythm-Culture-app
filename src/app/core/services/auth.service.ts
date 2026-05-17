@@ -10,11 +10,13 @@ import {
   signInWithRedirect,
   getRedirectResult,
   sendPasswordResetEmail,
+  sendEmailVerification,
   updateProfile,
   User,
   user,
   authState,
   OAuthProvider,
+  reload,
 } from '@angular/fire/auth';
 import {
   Firestore,
@@ -67,11 +69,35 @@ export class AuthService {
       password
     );
     await updateProfile(credential.user, { displayName });
+    // Fire-and-forget — surface failure via the resend flow if needed
+    sendEmailVerification(credential.user).catch(() => {});
     return this.createUserProfile(credential.user, { displayName });
   }
 
   async loginWithEmail(email: string, password: string): Promise<void> {
     await signInWithEmailAndPassword(this.auth, email, password);
+  }
+
+  // ─── Email Verification ──────────────────────────────────────────────────────
+
+  async resendVerificationEmail(): Promise<void> {
+    if (!this.auth.currentUser) throw new Error('Not signed in');
+    await sendEmailVerification(this.auth.currentUser);
+  }
+
+  async refreshEmailVerificationStatus(): Promise<boolean> {
+    if (!this.auth.currentUser) return false;
+    await reload(this.auth.currentUser);
+    return this.auth.currentUser.emailVerified;
+  }
+
+  isEmailVerified(): boolean {
+    const u = this.auth.currentUser;
+    if (!u) return false;
+    // OAuth providers (Google/Apple) come pre-verified; only email/password users
+    // ever land in an unverified state.
+    if (u.providerData.some((p) => p.providerId !== 'password')) return true;
+    return u.emailVerified;
   }
 
   // ─── Google Auth ─────────────────────────────────────────────────────────────

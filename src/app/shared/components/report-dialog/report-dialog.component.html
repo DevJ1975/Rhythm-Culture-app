@@ -1,0 +1,34 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="close()" aria-label="Close">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Report</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <p class="text-sm text-gray-500 mb-4">
+    Help keep Rhythm Culture safe. Reports are anonymous — the user you report won't be told who reported them.
+  </p>
+
+  <ion-radio-group [(ngModel)]="reason">
+    <ion-list>
+      <ion-item *ngFor="let r of reasons">
+        <ion-label>{{ r.label }}</ion-label>
+        <ion-radio slot="end" [value]="r.value"></ion-radio>
+      </ion-item>
+    </ion-list>
+  </ion-radio-group>
+
+  <ion-item class="mt-4">
+    <ion-label position="stacked">Additional details (optional)</ion-label>
+    <ion-textarea [(ngModel)]="details" rows="3" maxlength="500"></ion-textarea>
+  </ion-item>
+
+  <ion-button expand="block" class="mt-6" (click)="submit()" [disabled]="submitting">
+    {{ submitting ? 'Submitting...' : 'Submit report' }}
+  </ion-button>
+</ion-content>

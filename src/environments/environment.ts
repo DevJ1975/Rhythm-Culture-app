@@ -19,4 +19,6 @@ export const environment = {
   },
   useEmulators: true,
   appVersion: '1.0.0',
+  sentryDsn: '' as string,
+  stripePublishableKey: '' as string,
 };

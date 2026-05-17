@@ -28,8 +28,11 @@
     >{{ s }}</button>
   </div>
 
-  <!-- Segment: Artists / Collabs -->
+  <!-- Segment: Trending / Artists / Collabs -->
   <ion-segment [(ngModel)]="activeSegment" class="px-4 mb-4" color="primary">
+    <ion-segment-button value="trending">
+      <ion-label>Trending</ion-label>
+    </ion-segment-button>
     <ion-segment-button value="artists">
       <ion-label>Artists</ion-label>
     </ion-segment-button>
@@ -37,6 +40,39 @@
       <ion-label>Collaborations</ion-label>
     </ion-segment-button>
   </ion-segment>
+
+  <!-- ── Trending ── -->
+  <ng-container *ngIf="activeSegment === 'trending'">
+    <!-- Trending hashtags -->
+    <div *ngIf="trendingTags.length" class="px-4 mb-4">
+      <h2 class="text-white text-sm font-semibold uppercase tracking-wide mb-2 flex items-center gap-2">
+        <ion-icon name="flame-outline" class="text-primary-400"></ion-icon>
+        Trending Hashtags
+      </h2>
+      <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+        <a *ngFor="let t of trendingTags"
+           [routerLink]="['/hashtag', t.tag]"
+           class="flex-shrink-0 px-3 py-2 rounded-xl bg-dark-200 border border-dark-300">
+          <p class="text-primary-400 font-semibold text-sm">#{{ t.tag }}</p>
+          <p class="text-gray-500 text-xs">{{ t.count }} posts</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- Trending posts -->
+    <div *ngIf="isLoadingTrending" class="px-4 space-y-3">
+      <div *ngFor="let i of [1,2,3]">
+        <ion-skeleton-text animated style="width: 100%; height: 200px;" class="rounded-xl"></ion-skeleton-text>
+      </div>
+    </div>
+
+    <app-post-card *ngFor="let post of trendingPosts" [post]="post"></app-post-card>
+
+    <div *ngIf="!isLoadingTrending && trendingPosts.length === 0" class="flex flex-col items-center py-16">
+      <ion-icon name="flame-outline" class="text-gray-700 text-5xl mb-4"></ion-icon>
+      <p class="text-gray-500">No trending posts yet — check back soon</p>
+    </div>
+  </ng-container>
 
   <!-- ── Artists list ── -->
   <ng-container *ngIf="activeSegment === 'artists'">

@@ -14,6 +14,7 @@ import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { AuthService } from '../../core/services/auth.service';
 import { PostService } from '../../core/services/post.service';
 import { StorageService, UploadProgress } from '../../core/services/storage.service';
+import { SearchService } from '../../core/services/search.service';
 import { MediaItem } from '../../models';
 
 @Component({
@@ -31,6 +32,7 @@ export class CreatePostPage {
   private authService = inject(AuthService);
   private postService = inject(PostService);
   private storageService = inject(StorageService);
+  private searchService = inject(SearchService);
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private toastCtrl = inject(ToastController);
@@ -125,12 +127,18 @@ export class CreatePostPage {
         }
       }
 
+      const caption = this.form.value.caption ?? '';
+      const extracted = this.searchService.extractTagsAndMentions(caption);
+      const mergedTags = Array.from(
+        new Set([...this.tags, ...extracted.tags].map((t) => t.toLowerCase()))
+      );
+
       await this.postService.createPost({
         authorId: uid,
         type: uploadedMedia.length > 0 ? uploadedMedia[0].type : 'text',
-        caption: this.form.value.caption ?? '',
+        caption,
         media: uploadedMedia,
-        tags: this.tags,
+        tags: mergedTags,
         likesCount: 0,
         commentsCount: 0,
         sharesCount: 0,
